@@ -1,9 +1,11 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { AuctionStatus } from './auction-status.enum';
 import { Item } from './item.entity';
@@ -41,21 +43,21 @@ export class Auction {
   currentHighBid: number;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Factory((faker) => faker.date.recent())
   createdAt: string;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Factory((faker) => faker.date.recent())
   updatedAt: string;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamptz',
   })
   @Factory((faker) => faker.date.recent())
   auctionEnd: string;

@@ -42,12 +42,22 @@ export class AuctionService {
     return this.auctionRepository.save(newAuction);
   }
 
-  async findAll() {
-    return this.auctionRepository
+  async findAll(date?: string) {
+    const query = this.auctionRepository
       .createQueryBuilder('auction')
       .leftJoinAndSelect('auction.item', 'item')
-      .orderBy('item.make', 'ASC')
-      .getMany();
+      .orderBy('item.make', 'ASC');
+
+    if (date) {
+      query.where(
+        "TO_CHAR(auction.updatedAt, 'YYYY-MM-DD HH24:MI:SS') > :date",
+        {
+          date,
+        },
+      );
+    }
+
+    return query.getMany();
   }
 
   async findOne(id: number) {

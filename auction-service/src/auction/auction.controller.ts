@@ -1,19 +1,20 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
 } from '@nestjs/common';
+import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { AuctionService } from './auction.service';
+import { AuctionDto } from './dto/auction.dto';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
-import { Serialize } from 'src/interceptors/serialize.interceptor';
-import { AuctionDto } from './dto/auction.dto';
 
-@Controller('auctions')
+@Controller('api/auctions')
 export class AuctionController {
   constructor(private readonly auctionService: AuctionService) {}
 
@@ -25,8 +26,8 @@ export class AuctionController {
 
   @Get()
   @Serialize(AuctionDto)
-  findAll() {
-    return this.auctionService.findAll();
+  findAll(@Query('date') date?: string) {
+    return this.auctionService.findAll(date);
   }
 
   @Get(':id')
