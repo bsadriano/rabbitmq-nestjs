@@ -8,6 +8,9 @@ export class Item {
   _id: MongooseSchema.Types.ObjectId;
 
   @Field((type) => Float)
+  id: number;
+
+  @Field((type) => Float)
   reservePrice: number;
 
   @Field()

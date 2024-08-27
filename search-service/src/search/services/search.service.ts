@@ -5,6 +5,7 @@ import { GetItemArgs } from '../dto/get-items.args';
 import { CreateItemInput } from '../dto/item.inputs';
 import { Item } from '../item.schema';
 import { AuctionSvcHttpClientService } from './auction-svc-http-client.service';
+import { AuctionUpdated } from 'src/queue/contracts/auction-updated';
 
 @Injectable()
 export class SearchService {
@@ -99,5 +100,15 @@ export class SearchService {
 
   async getItem(_id: MongooseSchema.Types.ObjectId): Promise<Item> {
     return this.itemModel.findById(_id).exec();
+  }
+
+  async update(data: AuctionUpdated) {
+    return await this.itemModel.findOneAndUpdate({ id: data.id }, data, {
+      new: true,
+    });
+  }
+
+  async deleteById(id: number) {
+    return await this.itemModel.findOneAndDelete({ id });
   }
 }

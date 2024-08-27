@@ -1,6 +1,5 @@
 import { Expose, Transform } from 'class-transformer';
 import { AuctionStatus } from '../entities/auction-status.enum';
-import { Item } from '../entities/item.entity';
 import { Auction } from '../entities/auction.entity';
 
 export class AuctionDto {

@@ -4,7 +4,9 @@ import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SearchModule } from './search/search.module';
+import { QueueModule } from './queue/queue.module';
 import configuration from './config/configuration';
+import { RmqModule } from './rmq/rmq.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import configuration from './config/configuration';
       autoSchemaFile: true,
     }),
     SearchModule,
+    QueueModule,
   ],
+  controllers: [],
 })
 export class AppModule {}

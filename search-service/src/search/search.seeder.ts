@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Seeder } from 'nestjs-seeder';
@@ -7,6 +7,8 @@ import { AuctionSvcHttpClientService } from './services/auction-svc-http-client.
 
 @Injectable()
 export class SearchSeeder implements Seeder {
+  private logger = new Logger('Search Seeder');
+
   constructor(
     @InjectModel(Item.name) private readonly item: Model<Item>,
     private readonly auctionSvcHttpClient: AuctionSvcHttpClientService,
@@ -15,7 +17,7 @@ export class SearchSeeder implements Seeder {
   async seed(): Promise<any> {
     const items = await this.auctionSvcHttpClient.getItemsForSearchDb();
 
-    console.log(`${items.length} returned from auction service`);
+    this.logger.verbose(`${items.length} returned from auction service`);
 
     if (items.length > 0) {
       await this.item.insertMany(

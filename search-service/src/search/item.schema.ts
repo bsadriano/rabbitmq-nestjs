@@ -4,6 +4,9 @@ import { Document, Schema as MongooseSchema } from 'mongoose';
 @Schema()
 export class Item extends Document {
   @Prop()
+  id: number;
+
+  @Prop()
   reservePrice: number;
 
   @Prop({ type: Date, default: Date.now })

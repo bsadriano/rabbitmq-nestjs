@@ -1,15 +1,13 @@
+import { Factory } from 'nestjs-seeder';
 import {
   Column,
-  CreateDateColumn,
   Entity,
   JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { AuctionStatus } from './auction-status.enum';
 import { Item } from './item.entity';
-import { Factory } from 'nestjs-seeder';
 
 @Entity()
 export class Auction {

@@ -1,17 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
-import { DeepPartial, IsNull, Not, Repository } from 'typeorm';
+import { Connection, DeepPartial, IsNull, Not, Repository } from 'typeorm';
 import { Auction } from './entities/auction.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuctionStatus } from './entities/auction-status.enum';
 import { Item } from './entities/item.entity';
+import { ProducerService } from 'src/queue/services/producer.service';
+import { AuctionCreated } from 'src/queue/contracts/auction-created';
 
 @Injectable()
 export class AuctionService {
   constructor(
     @InjectRepository(Auction) private auctionRepository: Repository<Auction>,
     @InjectRepository(Item) private itemRepository: Repository<Item>,
+    private producerService: ProducerService,
   ) {}
 
   async create({
@@ -32,6 +35,7 @@ export class AuctionService {
       model,
       year,
     });
+
     const newAuction = this.auctionRepository.create({
       item: newItem,
       seller: 'test',
@@ -39,7 +43,12 @@ export class AuctionService {
       auctionEnd,
       status: AuctionStatus.LIVE,
     });
-    return this.auctionRepository.save(newAuction);
+
+    const savedAuction = await this.auctionRepository.save(newAuction);
+
+    this.producerService.createAuction(savedAuction);
+
+    return savedAuction;
   }
 
   async findAll(date?: string) {
@@ -96,12 +105,19 @@ export class AuctionService {
 
     await this.auctionRepository.save(existingAuction);
 
+    this.producerService.updateAuction(id, updateAuctionDto);
+
     return existingAuction;
   }
 
   async remove(id: number) {
-    const auction = await this.findOne(id);
-    this.auctionRepository.remove(auction);
+    try {
+      const auction = await this.findOne(id);
+
+      this.auctionRepository.remove(auction);
+
+      this.producerService.deleteAuction(id);
+    } catch (err) {}
   }
 
   async save(auctions: DeepPartial<Auction[]>) {
