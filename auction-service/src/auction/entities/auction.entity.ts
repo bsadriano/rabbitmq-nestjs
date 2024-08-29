@@ -1,8 +1,10 @@
 import { Factory } from 'nestjs-seeder';
+import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -20,9 +22,13 @@ export class Auction {
   )
   reservePrice: number = 0;
 
-  @Column()
-  @Factory((faker) => faker.person.fullName())
-  seller: string;
+  @JoinColumn()
+  @ManyToOne(() => User, (user) => user.auctions, {
+    eager: true,
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  seller: User;
 
   @Column({ nullable: true })
   @Factory((faker) => faker.person.fullName())
@@ -65,6 +71,10 @@ export class Auction {
   status: AuctionStatus;
 
   @JoinColumn()
-  @OneToOne(() => Item, (item) => item.auction, { eager: true, cascade: true })
+  @OneToOne(() => Item, (item) => item.auction, {
+    eager: true,
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   item: Item;
 }

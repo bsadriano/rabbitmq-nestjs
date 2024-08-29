@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AuctionModule } from './auction/auction.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { QueueModule } from './queue/queue.module';
 import { ConfigModule } from '@nestjs/config';
+import { AuctionModule } from './auction/auction.module';
 import configuration from './config/configuration';
+import { DatabaseModule } from './database/database.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -11,18 +11,9 @@ import configuration from './config/configuration';
       isGlobal: true,
       load: [configuration],
     }),
+    DatabaseModule.forRoot(),
     AuctionModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'pass123',
-      database: 'postgres',
-      autoLoadEntities: true,
-      synchronize: true,
-    }),
-    QueueModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],

@@ -4,9 +4,9 @@ import { plainToInstance } from 'class-transformer';
 import { UpdateAuctionDto } from 'src/auction/dto/update-auction.dto';
 import { Auction } from 'src/auction/entities/auction.entity';
 import { AUCTION_SERVICE } from 'src/constants/services';
-import { AuctionCreated } from '../contracts/auction-created';
-import { AuctionUpdated } from '../contracts/auction-updated';
-import { AuctionDeleted } from '../contracts/auction-deleted';
+import { AuctionCreated } from '../dto/auction-created.dto';
+import { AuctionUpdated } from '../dto/auction-updated.dto';
+import { AuctionDeleted } from '../dto/auction-deleted.dto';
 
 @Injectable()
 export class ProducerService {

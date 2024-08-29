@@ -1,11 +1,11 @@
 import { Controller, Logger } from '@nestjs/common';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { SearchService } from 'src/search/services/search.service';
-import { AuctionCreated } from './contracts/auction-created';
 import { CreateItemInput } from 'src/search/dto/item.inputs';
-import { AuctionUpdated } from './contracts/auction-updated';
-import { AuctionDeleted } from './contracts/auction-deleted';
 import { RmqService } from 'src/rmq/rmq.service';
+import { AuctionCreated } from './dto/auction-created.dto';
+import { AuctionUpdated } from './dto/auction-updated';
+import { AuctionDeleted } from './dto/auction-deleted.dto';
 
 @Controller()
 export class QueueController {

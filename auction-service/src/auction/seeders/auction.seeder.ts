@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 import { DataFactory, seeder, Seeder } from 'nestjs-seeder';
+import { User } from 'src/users/entities/user.entity';
 import { DeepPartial } from 'typeorm';
+import configuration from '../../config/configuration';
 import { AuctionModule } from '../auction.module';
 import { AuctionService } from '../auction.service';
 import { Auction } from '../entities/auction.entity';
@@ -18,15 +22,27 @@ export class AuctionSeeder implements Seeder {
       10,
     ) as DeepPartial<Item>[];
 
-    for (let i = 0; i < auctions.length; i++) {
-      auctions[i].item = items[i];
-    }
-
-    this.auctions = auctions;
+    this.auctions = auctions.map((auction, i) => {
+      auction.item = items[i];
+      return auction;
+    });
   }
 
   async seed(): Promise<any> {
-    return this.auctionService.save(this.auctions);
+    const user: DeepPartial<User> = {
+      username: 'bob',
+      email: 'bob@email.com',
+      firstName: 'Bob',
+      lastName: 'Vance',
+      password: await bcrypt.hash('pass123', 10),
+    };
+
+    return this.auctionService.save(
+      this.auctions.map((auction) => {
+        auction.seller = user;
+        return auction;
+      }),
+    );
   }
 
   async drop(): Promise<any> {
@@ -36,6 +52,10 @@ export class AuctionSeeder implements Seeder {
 
 seeder({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -44,9 +64,9 @@ seeder({
       password: 'pass123',
       database: 'postgres',
       autoLoadEntities: true,
+      entities: [Auction, User],
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([Auction]),
     AuctionModule,
   ],
 }).run([AuctionSeeder]);

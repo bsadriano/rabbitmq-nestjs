@@ -1,9 +1,13 @@
+import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { USER_QUEUE } from './constants/services';
+import { RmqService } from './rmq/rmq.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -14,6 +18,12 @@ async function bootstrap() {
       },
     }),
   );
-  await app.listen(7001);
+
+  const rmqService = app.get<RmqService>(RmqService);
+  app.connectMicroservice(rmqService.getOptions(USER_QUEUE));
+
+  const configService = app.get(ConfigService);
+  await app.startAllMicroservices();
+  await app.listen(configService.get<number>('port'));
 }
 bootstrap();

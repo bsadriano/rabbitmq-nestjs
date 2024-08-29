@@ -2,6 +2,12 @@ import { Expose, Transform } from 'class-transformer';
 import { AuctionStatus } from '../entities/auction-status.enum';
 import { Auction } from '../entities/auction.entity';
 
+const getFullName = (firstName: string, lastName: string) =>
+  `${capitalizeFirstLetter(firstName)} ${capitalizeFirstLetter(lastName)}`;
+
+const capitalizeFirstLetter = (string: string) =>
+  string.charAt(0).toUpperCase() + string.slice(1);
+
 export class AuctionDto {
   @Expose()
   id: number;
@@ -10,6 +16,9 @@ export class AuctionDto {
   reservePrice: number;
 
   @Expose()
+  @Transform(({ obj }: { obj: Auction }) =>
+    getFullName(obj.seller.firstName, obj.seller.lastName),
+  )
   seller: string;
 
   @Expose()

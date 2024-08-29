@@ -1,32 +1,36 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProducerService } from 'src/queue/services/producer.service';
+import { User } from 'src/users/entities/user.entity';
+import { DeepPartial, IsNull, Not, Repository } from 'typeorm';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
-import { Connection, DeepPartial, IsNull, Not, Repository } from 'typeorm';
-import { Auction } from './entities/auction.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 import { AuctionStatus } from './entities/auction-status.enum';
+import { Auction } from './entities/auction.entity';
 import { Item } from './entities/item.entity';
-import { ProducerService } from 'src/queue/services/producer.service';
-import { AuctionCreated } from 'src/queue/contracts/auction-created';
 
 @Injectable()
 export class AuctionService {
   constructor(
     @InjectRepository(Auction) private auctionRepository: Repository<Auction>,
     @InjectRepository(Item) private itemRepository: Repository<Item>,
+    @InjectRepository(User) private userRepository: Repository<User>,
     private producerService: ProducerService,
   ) {}
 
-  async create({
-    auctionEnd,
-    color,
-    imageUrl,
-    make,
-    mileage,
-    model,
-    reservePrice,
-    year,
-  }: CreateAuctionDto) {
+  async create(
+    {
+      auctionEnd,
+      color,
+      imageUrl,
+      make,
+      mileage,
+      model,
+      reservePrice,
+      year,
+    }: CreateAuctionDto,
+    seller: User,
+  ) {
     const newItem = this.itemRepository.create({
       color,
       imageUrl,
@@ -38,7 +42,7 @@ export class AuctionService {
 
     const newAuction = this.auctionRepository.create({
       item: newItem,
-      seller: 'test',
+      seller,
       reservePrice,
       auctionEnd,
       status: AuctionStatus.LIVE,
@@ -51,10 +55,13 @@ export class AuctionService {
     return savedAuction;
   }
 
-  async findAll(date?: string) {
+  async findAll(userId: number, date?: string) {
     const query = this.auctionRepository
       .createQueryBuilder('auction')
-      .leftJoinAndSelect('auction.item', 'item')
+      .innerJoinAndSelect('auction.item', 'item')
+      .innerJoinAndSelect('auction.seller', 'seller', 'seller.id = :id', {
+        id: userId,
+      })
       .orderBy('item.make', 'ASC');
 
     if (date) {
@@ -69,11 +76,14 @@ export class AuctionService {
     return query.getMany();
   }
 
-  async findOne(id: number) {
+  async findOne(userId: number, id: number) {
     const auction = await this.auctionRepository.findOne({
-      relations: ['item'],
+      relations: ['item', 'seller'],
       where: {
         id,
+        seller: {
+          id: userId,
+        },
       },
     });
 
@@ -84,11 +94,14 @@ export class AuctionService {
     return auction;
   }
 
-  async update(id: number, updateAuctionDto: UpdateAuctionDto) {
+  async update(userId: number, id: number, updateAuctionDto: UpdateAuctionDto) {
     const existingAuction = await this.auctionRepository.findOne({
       relations: ['item'],
       where: {
         id,
+        seller: {
+          id: userId,
+        },
       },
     });
 
@@ -110,14 +123,12 @@ export class AuctionService {
     return existingAuction;
   }
 
-  async remove(id: number) {
-    try {
-      const auction = await this.findOne(id);
+  async remove(userId: number, id: number) {
+    const auction = await this.findOne(userId, id);
 
-      this.auctionRepository.remove(auction);
+    this.auctionRepository.remove(auction);
 
-      this.producerService.deleteAuction(id);
-    } catch (err) {}
+    this.producerService.deleteAuction(id);
   }
 
   async save(auctions: DeepPartial<Auction[]>) {
@@ -125,7 +136,7 @@ export class AuctionService {
   }
 
   async deleteAll() {
-    this.auctionRepository.delete({
+    await this.itemRepository.delete({
       id: Not(IsNull()),
     });
   }

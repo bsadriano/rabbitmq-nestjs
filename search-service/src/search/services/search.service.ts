@@ -5,7 +5,7 @@ import { GetItemArgs } from '../dto/get-items.args';
 import { CreateItemInput } from '../dto/item.inputs';
 import { Item } from '../item.schema';
 import { AuctionSvcHttpClientService } from './auction-svc-http-client.service';
-import { AuctionUpdated } from 'src/queue/contracts/auction-updated';
+import { AuctionUpdated } from 'src/queue/dto/auction-updated';
 
 @Injectable()
 export class SearchService {

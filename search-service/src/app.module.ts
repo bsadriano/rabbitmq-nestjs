@@ -18,6 +18,7 @@ import { RmqModule } from './rmq/rmq.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,
+      context: ({ req, res }) => ({ req, res }),
     }),
     SearchModule,
     QueueModule,

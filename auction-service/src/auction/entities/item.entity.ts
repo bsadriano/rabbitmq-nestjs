@@ -1,12 +1,6 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Auction } from './auction.entity';
 import { Factory } from 'nestjs-seeder';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Auction } from './auction.entity';
 
 @Entity()
 export class Item {

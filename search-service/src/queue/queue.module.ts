@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
+import { RmqModule } from 'src/rmq/rmq.module';
 import { SearchModule } from 'src/search/search.module';
 import { QueueController } from './queue.controller';
-import { RmqModule } from 'src/rmq/rmq.module';
 
 @Module({
   imports: [SearchModule, RmqModule],
