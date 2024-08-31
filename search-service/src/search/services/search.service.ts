@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Schema as MongooseSchema } from 'mongoose';
 import { GetItemArgs } from '../dto/get-items.args';
 import { CreateItemInput } from '../dto/item.inputs';
 import { Item } from '../item.schema';
+import { Item as ItemModel } from '../item.model';
 import { AuctionSvcHttpClientService } from './auction-svc-http-client.service';
 import { AuctionUpdated } from 'src/queue/dto/auction-updated';
+import { AuctionFinished } from '../dto/auction-finished.dto';
+import { AuctionBidPlaced } from '../dto/auction-bid-placed.dto';
 
 @Injectable()
 export class SearchService {
@@ -110,5 +113,48 @@ export class SearchService {
 
   async deleteById(id: number) {
     return await this.itemModel.findOneAndDelete({ id });
+  }
+
+  async finishAuction({ id, itemSold, soldAmount, winner }: AuctionFinished) {
+    const auction = await this.itemModel.findById({
+      id,
+    });
+
+    if (!auction) {
+      throw new NotFoundException(`Auction with id #${id} not found`);
+    }
+
+    const update: any = {};
+
+    if (itemSold) {
+      update.winner = winner;
+      update.soldAmount = soldAmount;
+    }
+    update.status = 'Finished';
+
+    await this.itemModel.updateOne({ id }, update);
+  }
+
+  async placeBid({ id, amount, bidStatus, currentHighBid }: AuctionBidPlaced) {
+    const auction = await this.itemModel.findById({
+      id,
+    });
+
+    if (!auction) {
+      throw new NotFoundException(`Auction with id #${id} not found`);
+    }
+
+    const update: any = {};
+
+    if (
+      auction.currentHighBid == null ||
+      (bidStatus.includes('Accepted') && amount > auction.currentHighBid)
+    ) {
+      update.currentHighBid = amount;
+    }
+
+    update.status = 'Finished';
+
+    await this.itemModel.updateOne({ id }, update);
   }
 }

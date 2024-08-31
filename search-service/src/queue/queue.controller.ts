@@ -6,6 +6,8 @@ import { RmqService } from 'src/rmq/rmq.service';
 import { AuctionCreated } from './dto/auction-created.dto';
 import { AuctionUpdated } from './dto/auction-updated';
 import { AuctionDeleted } from './dto/auction-deleted.dto';
+import { AuctionFinished } from 'src/search/dto/auction-finished.dto';
+import { AuctionBidPlaced } from 'src/search/dto/auction-bid-placed.dto';
 
 @Controller()
 export class QueueController {
@@ -63,5 +65,29 @@ export class QueueController {
     this.rmqService.ack(context);
 
     this.logger.verbose('Successfully deleted auction');
+  }
+
+  @EventPattern('auction-finished')
+  async handleAuctionFinished(
+    @Payload() auctionFinished: AuctionFinished,
+    @Ctx() context: RmqContext,
+  ) {
+    this.logger.verbose('Consuming auction finished');
+
+    await this.searchService.finishAuction(auctionFinished);
+
+    this.rmqService.ack(context);
+  }
+
+  @EventPattern('auction-bid-placed')
+  async handleBidPlaced(
+    @Payload() auctionBidPlaced: AuctionBidPlaced,
+    @Ctx() context: RmqContext,
+  ) {
+    this.logger.verbose('Consuming bid placed');
+
+    await this.searchService.placeBid(auctionBidPlaced);
+
+    this.rmqService.ack(context);
   }
 }

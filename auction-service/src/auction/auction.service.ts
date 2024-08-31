@@ -8,6 +8,8 @@ import { UpdateAuctionDto } from './dto/update-auction.dto';
 import { AuctionStatus } from './entities/auction-status.enum';
 import { Auction } from './entities/auction.entity';
 import { Item } from './entities/item.entity';
+import { AuctionFinished } from './dto/auction-finished.dto';
+import { AuctionBidPlaced } from './dto/auction-bid-placed.dto';
 
 @Injectable()
 export class AuctionService {
@@ -139,5 +141,36 @@ export class AuctionService {
     await this.itemRepository.delete({
       id: Not(IsNull()),
     });
+  }
+
+  async finishAuction({ id, itemSold, soldAmount, winner }: AuctionFinished) {
+    const auction = await this.auctionRepository.findOneByOrFail({
+      id,
+    });
+
+    if (itemSold) {
+      auction.winner = winner;
+      auction.soldAmount = soldAmount;
+    }
+
+    auction.status =
+      auction.soldAmount > auction.reservePrice
+        ? AuctionStatus.FINISHED
+        : AuctionStatus.RESERVE_NOT_MET;
+
+    return this.auctionRepository.save(auction);
+  }
+
+  async placeBid({ id, amount, bidStatus, currentHighBid }: AuctionBidPlaced) {
+    var auction = await this.auctionRepository.findOneByOrFail({ id });
+
+    if (
+      auction.currentHighBid == null ||
+      (bidStatus.includes('Accepted') && amount > auction.currentHighBid)
+    ) {
+      auction.currentHighBid = amount;
+    }
+
+    return this.auctionRepository.save(auction);
   }
 }

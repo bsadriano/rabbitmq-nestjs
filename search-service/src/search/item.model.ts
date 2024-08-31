@@ -14,6 +14,18 @@ export class Item {
   reservePrice: number;
 
   @Field()
+  seller: string;
+
+  @Field()
+  winner: string;
+
+  @Field((type) => Float)
+  soldAmount: number;
+
+  @Field((type) => Float)
+  currentHighBid: number;
+
+  @Field()
   createdAt: string;
 
   @Field()

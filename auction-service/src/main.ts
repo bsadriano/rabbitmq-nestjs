@@ -2,7 +2,11 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { USER_QUEUE } from './constants/services';
+import {
+  AUCTION_BID_PLACED_QUEUE,
+  AUCTION_FINISHED_QUEUE,
+  USER_QUEUE,
+} from './constants/services';
 import { RmqService } from './rmq/rmq.service';
 
 async function bootstrap() {
@@ -21,6 +25,8 @@ async function bootstrap() {
 
   const rmqService = app.get<RmqService>(RmqService);
   app.connectMicroservice(rmqService.getOptions(USER_QUEUE));
+  app.connectMicroservice(rmqService.getOptions(AUCTION_FINISHED_QUEUE));
+  app.connectMicroservice(rmqService.getOptions(AUCTION_BID_PLACED_QUEUE));
 
   const configService = app.get(ConfigService);
   await app.startAllMicroservices();

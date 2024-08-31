@@ -3,24 +3,34 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
   Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
+import { RmqService } from 'src/rmq/rmq.service';
+import { User } from 'src/users/entities/user.entity';
 import { AuctionService } from './auction.service';
+import { AuctionBidPlaced } from './dto/auction-bid-placed.dto';
+import { AuctionFinished } from './dto/auction-finished.dto';
 import { AuctionDto } from './dto/auction.dto';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { CurrentUser } from 'src/auth/current-user.decorator';
-import { User } from 'src/users/entities/user.entity';
 
 @Controller('api/auctions')
 export class AuctionController {
-  constructor(private readonly auctionService: AuctionService) {}
+  private logger = new Logger('AuctionController');
+
+  constructor(
+    private readonly auctionService: AuctionService,
+    private readonly rmqService: RmqService,
+  ) {}
 
   @Post()
   @Serialize(AuctionDto)
@@ -61,5 +71,29 @@ export class AuctionController {
   @UseGuards(JwtAuthGuard)
   remove(@CurrentUser() user: User, @Param('id') id: string) {
     return this.auctionService.remove(user.id, +id);
+  }
+
+  @EventPattern('auction-finished')
+  async handleAuctionFinished(
+    @Payload() auctionFinished: AuctionFinished,
+    @Ctx() context: RmqContext,
+  ) {
+    this.logger.verbose('Consuming auction finished');
+
+    await this.auctionService.finishAuction(auctionFinished);
+
+    this.rmqService.ack(context);
+  }
+
+  @EventPattern('auction-bid-placed')
+  async handleBidPlaced(
+    @Payload() auctionBidPlaced: AuctionBidPlaced,
+    @Ctx() context: RmqContext,
+  ) {
+    this.logger.verbose('Consuming bid placed');
+
+    await this.auctionService.placeBid(auctionBidPlaced);
+
+    this.rmqService.ack(context);
   }
 }
