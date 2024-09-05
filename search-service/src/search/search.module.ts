@@ -9,12 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Item } from './entities/item.entity';
 
 @Module({
-  imports: [
-    HttpModule,
-    TypeOrmModule.forFeature([Item]),
-    // MongooseModule.forFeature([{ name: Item.name, schema: itemSchema }]),
-    AuthModule,
-  ],
+  imports: [HttpModule, TypeOrmModule.forFeature([Item]), AuthModule],
   providers: [SearchResolver, SearchService, AuctionSvcHttpClientService],
   exports: [SearchService, AuctionSvcHttpClientService],
 })

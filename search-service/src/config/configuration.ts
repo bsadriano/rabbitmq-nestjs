@@ -9,4 +9,11 @@ export default () => ({
     auction_finished_queue: process.env.RMQ_AUCTION_FINISHED_QUEUE,
     auction_bid_placed_queue: process.env.RMQ_AUCTION_BID_PLACED_QUEUE,
   },
+  graphql: {
+    endpoint: process.env.GRAPHQL_ENDPOINT,
+  },
+  mongodb: {
+    connection_string: process.env.MONGODB_CONNECTION_STRING,
+    db: process.env.MONGODB_DB,
+  },
 });

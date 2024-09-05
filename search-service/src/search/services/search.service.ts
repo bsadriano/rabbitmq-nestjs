@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 // import { InjectModel } from '@nestjs/mongoose';
-import { Model, Schema as MongooseSchema } from 'mongoose';
 import { ConnectionArgs, findAndPaginate } from 'nestjs-graphql-relay';
 import { AuctionUpdated } from 'src/queue/dto/auction-updated';
 import { FindManyOptions, Repository } from 'typeorm';
@@ -8,9 +7,9 @@ import { AuctionBidPlaced } from '../dto/auction-bid-placed.dto';
 import { AuctionFinished } from '../dto/auction-finished.dto';
 import { CreateItemInput } from '../dto/item.inputs';
 // import { Item } from '../item.schema';
-import { AuctionSvcHttpClientService } from './auction-svc-http-client.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Item } from '../entities/item.entity';
+import { ItemsConnectionArgs } from '../dto/items-connection.args';
 
 // type PagedResult<T> = {
 //   results: T[];
@@ -21,7 +20,6 @@ import { Item } from '../entities/item.entity';
 @Injectable()
 export class SearchService {
   constructor(
-    // @InjectModel(Item.name) private itemModel: Model<Item>,
     // private readonly auctionSvcHttpClientService: AuctionSvcHttpClientService,
     @InjectRepository(Item) private itemRepository: Repository<Item>,
   ) {}
@@ -34,8 +32,72 @@ export class SearchService {
     //   return await this.itemModel.countDocuments();
   }
 
-  async find(order: FindManyOptions<Item>['order'], connArgs: ConnectionArgs) {
-    return findAndPaginate({ order }, connArgs, this.itemRepository);
+  async find(connArgs: ItemsConnectionArgs) {
+    // const { searchTerm, seller, winner, orderBy, filterBy } = connArgs;
+
+    // let where = {};
+    // if (searchTerm) {
+    //   where = {
+    //     $text: { $search: searchTerm },
+    //   };
+    // }
+
+    // let order;
+    // switch (orderBy) {
+    //   case 'make':
+    //     order = { make: 'ASC' };
+    //     break;
+    //   case 'new':
+    //     order = { createdAt: 'DESC' };
+    //     break;
+    //   default:
+    //     order = { auctionEnd: 'DESC' };
+    //     break;
+    // }
+
+    // const now = new Date();
+    // const sixHoursLater = new Date(now.getTime() + 6 * 60 * 60 * 1000); // 6 hours later
+
+    // if (filterBy) {
+    //   switch (filterBy) {
+    //     case 'finished':
+    //       where = {
+    //         ...where,
+    //         auctionEnd: { $lt: now },
+    //       };
+    //       break;
+    //     case 'endingSoon':
+    //       where = {
+    //         ...where,
+    //         auctionEnd: { $lt: sixHoursLater, $gt: now },
+    //       };
+    //       break;
+    //     default:
+    //       where = {
+    //         ...where,
+    //         auctionEnd: { $gt: now },
+    //       };
+    //       break;
+    //   }
+    // }
+
+    // if (seller) {
+    //   where = {
+    //     ...where,
+    //     seller,
+    //   };
+    // }
+
+    // if (winner) {
+    //   where = {
+    //     ...where,
+    //     winner,
+    //   };
+    // }
+
+    console.log(await findAndPaginate({}, connArgs, this.itemRepository));
+
+    return findAndPaginate({}, connArgs, this.itemRepository);
   }
 
   // async getItems(args: GetItemArgs): Promise<Item[]> {

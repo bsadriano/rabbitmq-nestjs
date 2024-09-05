@@ -9,16 +9,6 @@ export class ItemsConnectionArgs extends ConnectionArgs {
   @IsString()
   readonly searchTerm?: string;
 
-  @Field((type) => Int, { defaultValue: 1 }) // Specify type for integer
-  @IsInt()
-  @Min(1)
-  readonly pageSize: number;
-
-  @Field((type) => Int, { defaultValue: 1 }) // Specify type for integer
-  @IsInt()
-  @Min(1)
-  readonly pageNumber: number;
-
   @Field({ nullable: true })
   @IsOptional()
   @IsString()

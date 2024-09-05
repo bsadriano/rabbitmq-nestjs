@@ -1,12 +1,12 @@
 import { Field, Float, ID, ObjectType } from '@nestjs/graphql';
 import { toGlobalId } from 'graphql-relay';
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ObjectIdColumn } from 'typeorm';
 import { Node } from '../../node/Node';
 
 @ObjectType({ implements: Node })
 @Entity('items')
 export class Item implements Node {
-  @PrimaryColumn()
+  @ObjectIdColumn()
   _id: string;
 
   @Field()

@@ -1,27 +1,26 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosError } from 'axios';
-import { Model } from 'mongoose';
 import { catchError, firstValueFrom } from 'rxjs';
-import { Item } from '../item.schema';
+import { Repository } from 'typeorm';
 import { AuctionResponseDto } from '../dto/auction-response.dto';
-import { format } from 'date-fns';
+import { Item } from '../entities/item.entity';
 
 @Injectable()
 export class AuctionSvcHttpClientService {
   constructor(
-    // @InjectModel(Item.name) private itemModel: Model<Item>,
+    @InjectRepository(Item) private itemRepository: Repository<Item>,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {}
 
   async getItemsForSearchDb(): Promise<AuctionResponseDto[]> {
-    // var lastUpdated = await this.itemModel
-    //   .findOne({})
-    //   .select('updatedAt')
-    //   .sort('-updatedAt');
+    var lastUpdated = await this.itemRepository.findOne({
+      select: ['updatedAt'],
+      order: { updatedAt: 'DESC' },
+    });
 
     var auctionURL = this.configService.get<string>('auction_service.url');
 
@@ -31,9 +30,9 @@ export class AuctionSvcHttpClientService {
 
     var url = auctionURL + '/api/auctions';
 
-    // if (lastUpdated !== null && lastUpdated.updatedAt) {
-    //   url += `?date=${format(lastUpdated.updatedAt, 'yyyy-MM-dd HH:mm:ss')}`;
-    // }
+    if (lastUpdated !== null && lastUpdated.updatedAt) {
+      url += `?date=${lastUpdated.updatedAt.toString().replace('T', ' ').substring(0, 19)}`;
+    }
 
     const { data } = await firstValueFrom(
       this.httpService.get(url).pipe(

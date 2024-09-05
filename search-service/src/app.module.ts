@@ -1,6 +1,6 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import configuration from './config/configuration';
@@ -15,7 +15,8 @@ import { getMetadataArgsStorage } from 'typeorm';
       load: [configuration],
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: async () => {
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
         const entities = getMetadataArgsStorage()
           .tables.map((tbl) => tbl.target as Function)
           .filter((entity) =>
@@ -24,22 +25,28 @@ import { getMetadataArgsStorage } from 'typeorm';
 
         return {
           type: 'mongodb',
-          url: 'mongodb://localhost:27017',
-          database: 'search',
+          url: configService.get<string>('mongodb.connection_string'),
+          database: configService.get<string>('mongodb.db'),
           entities,
           logging: true,
           autoLoadEntities: true,
         };
       },
+      inject: [ConfigService],
     }),
-    // MongooseModule.forRoot('mongodb://localhost:27017/search'),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      playground: {
-        endpoint: 'http://localhost:7002/graphql',
-      },
+    GraphQLModule.forRootAsync({
       driver: ApolloDriver,
-      autoSchemaFile: true,
-      context: ({ req, res }) => ({ req, res }),
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        return {
+          playground: {
+            endpoint: configService.get<string>('graphql.endpoint'),
+          },
+          autoSchemaFile: true,
+          context: ({ req, res }) => ({ req, res }),
+        };
+      },
+      inject: [ConfigService],
     }),
     SearchModule,
     QueueModule,
