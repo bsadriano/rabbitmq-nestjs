@@ -1,0 +1,43 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+input CreateItemInput {
+  auctionEnd: String!
+  carModel: String!
+  color: String!
+  imageUrl: String!
+  make: String!
+  mileage: Int!
+  reservePrice: Int!
+  year: Int!
+}
+
+type Item {
+  _id: ID!
+  auctionEnd: String!
+  carModel: String!
+  color: String!
+  createdAt: String!
+  currentHighBid: Float!
+  id: Float!
+  imageUrl: String!
+  make: String!
+  mileage: Int!
+  reservePrice: Float!
+  seller: String!
+  soldAmount: Float!
+  updatedAt: String!
+  winner: String!
+  year: Float!
+}
+
+type Mutation {
+  createItem(payload: CreateItemInput!): Item!
+}
+
+type Query {
+  item(_id: String!): Item!
+  items(filterBy: String, orderBy: String, pageNumber: Int! = 1, pageSize: Int! = 1, searchTerm: String, seller: String, winner: String): [Item!]!
+}

@@ -1,8 +1,10 @@
 import { Field, Float, ID, Int, ObjectType } from '@nestjs/graphql';
 import { SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Schema as MongooseSchema } from 'mongoose';
+import { Node } from '../node/Node';
+import { toGlobalId } from 'graphql-relay';
 
-@ObjectType()
+@ObjectType({ implements: Node })
 export class Item {
   @Field((type) => ID)
   _id: MongooseSchema.Types.ObjectId;
@@ -13,17 +15,17 @@ export class Item {
   @Field((type) => Float)
   reservePrice: number;
 
-  @Field()
-  seller: string;
+  @Field({ nullable: true })
+  seller?: string;
 
-  @Field()
-  winner: string;
+  @Field({ nullable: true })
+  winner?: string;
 
-  @Field((type) => Float)
-  soldAmount: number;
+  @Field((type) => Float, { nullable: true })
+  soldAmount?: number;
 
-  @Field((type) => Float)
-  currentHighBid: number;
+  @Field((type) => Float, { nullable: true })
+  currentHighBid?: number;
 
   @Field()
   createdAt: string;
@@ -51,6 +53,11 @@ export class Item {
 
   @Field()
   imageUrl: string;
+
+  @Field(() => ID, { name: 'id' })
+  get relayId(): string {
+    return toGlobalId('Recipe', this.id);
+  }
 }
 
 export const ItemSchema = SchemaFactory.createForClass(Item);

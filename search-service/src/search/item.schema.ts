@@ -9,17 +9,17 @@ export class Item extends Document {
   @Prop()
   reservePrice: number;
 
-  @Prop()
-  seller: string;
+  @Prop({ default: null })
+  seller?: string;
 
-  @Prop()
-  winner: string;
+  @Prop({ default: null })
+  winner?: string;
 
-  @Prop()
-  soldAmount: number;
+  @Prop({ default: 0 })
+  soldAmount?: number;
 
-  @Prop()
-  currentHighBid: number;
+  @Prop({ default: 0 })
+  currentHighBid?: number;
 
   @Prop({ type: Date, default: Date.now })
   createdAt: Date;

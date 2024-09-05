@@ -1,40 +1,41 @@
 import { ArgsType, Field, Int } from '@nestjs/graphql';
 import { IsInt, IsOptional, IsString, Min, MinLength } from 'class-validator';
+import { ConnectionArgs, OrderByInput } from 'nestjs-graphql-relay';
 
 @ArgsType()
-export class GetItemArgs {
+export class ItemsConnectionArgs extends ConnectionArgs {
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  searchTerm?: string;
+  readonly searchTerm?: string;
 
   @Field((type) => Int, { defaultValue: 1 }) // Specify type for integer
   @IsInt()
   @Min(1)
-  pageSize: number;
+  readonly pageSize: number;
 
   @Field((type) => Int, { defaultValue: 1 }) // Specify type for integer
   @IsInt()
   @Min(1)
-  pageNumber: number;
+  readonly pageNumber: number;
 
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  seller?: string;
+  readonly seller?: string;
 
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  winner?: string;
+  readonly winner?: string;
+
+  @Field(() => OrderByInput, { nullable: true })
+  @IsOptional()
+  @IsString()
+  readonly orderBy?: string;
 
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  orderBy?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  filterBy?: string;
+  readonly filterBy?: string;
 }

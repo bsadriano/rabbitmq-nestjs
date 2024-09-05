@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { ClientProxy } from '@nestjs/microservices';
@@ -31,9 +26,15 @@ export class AuthService {
     };
 
     const expires = new Date();
-    expires.setSeconds(
-      expires.getSeconds() + this.configService.get<number>('JWT_EXPIRATION'),
-    );
+    console.log(expires.toISOString());
+
+    expires.setSeconds(expires.getSeconds() + 3600);
+    console.log(expires.toISOString());
+
+    // console.log(
+    //   expires.getSeconds(),
+    //   +expires.getSeconds() + this.configService.get<number>('jwt.expiration'),
+    // );
 
     const token = this.jwtService.sign(tokenPayload);
 
