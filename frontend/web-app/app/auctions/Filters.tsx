@@ -45,26 +45,29 @@ const filterButtons = [
 interface Props {}
 
 const Filters = (props: Props) => {
-  const pageSize = useParamsStore((state) => state.pageSize);
+  const first = useParamsStore((state) => state.first);
   const setParams = useParamsStore((state) => state.setParams);
   const orderBy = useParamsStore((state) => state.orderBy);
   const filterBy = useParamsStore((state) => state.filterBy);
 
   return (
-    <div className="flex justify-space-between items-center mb-4">
+    <div className="flex justify-between items-center mb-4">
       <div>
         <span className="uppercase text-sm text-gray-500 mr-2">Filter by</span>
         <ButtonGroup>
-          {filterButtons.map(({ label, icon: Icon, value }) => (
-            <Button
-              key={value}
-              onClick={() => setParams({ filterBy: value })}
-              color={`${filterBy === value ? "red" : "gray"}`}
-            >
-              <Icon className="mr-3 h-4 w-4" />
-              {label}
-            </Button>
-          ))}
+          {filterButtons.map(({ label, icon: Icon, value }) => {
+            return (
+              <Button
+                key={value}
+                onClick={() => setParams({ filterBy: value })}
+                color={`${filterBy === value ? "red" : "gray"}`}
+                className="flex items-center"
+              >
+                <Icon className="mr-3 h-4 w-4" />
+                {label}
+              </Button>
+            );
+          })}
         </ButtonGroup>
       </div>
       <div>
@@ -88,8 +91,8 @@ const Filters = (props: Props) => {
           {pageSizeButtons.map((value, i) => (
             <Button
               key={i}
-              onClick={() => setParams({ pageSize: value })}
-              color={`${pageSize === value ? "red" : "gray"}`}
+              onClick={() => setParams({ first: value, last: value })}
+              color={`${first === value ? "red" : "gray"}`}
               className="focus:ring-0"
             >
               {value}

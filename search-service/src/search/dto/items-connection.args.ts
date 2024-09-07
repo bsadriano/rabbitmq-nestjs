@@ -1,23 +1,34 @@
 import { ArgsType, Field, Int } from '@nestjs/graphql';
-import { IsInt, IsOptional, IsString, Min, MinLength } from 'class-validator';
-import { ConnectionArgs, OrderByInput } from 'nestjs-graphql-relay';
+import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
+import * as Relay from 'graphql-relay';
+import { ConnectionArgs } from 'nestjs-graphql-relay';
 
 @ArgsType()
-export class ItemsConnectionArgs extends ConnectionArgs {
+export class ItemsConnectionArgs {
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  readonly before?: Relay.ConnectionCursor | null;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  readonly after?: Relay.ConnectionCursor | null;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  readonly first?: number | null;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  readonly last?: number | null;
+
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
   readonly searchTerm?: string;
-
-  @Field((type) => Int, { defaultValue: 1 }) // Specify type for integer
-  @IsInt()
-  @Min(1)
-  readonly pageSize: number;
-
-  @Field((type) => Int, { defaultValue: 1 }) // Specify type for integer
-  @IsInt()
-  @Min(1)
-  readonly pageNumber: number;
 
   @Field({ nullable: true })
   @IsOptional()
@@ -29,7 +40,7 @@ export class ItemsConnectionArgs extends ConnectionArgs {
   @IsString()
   readonly winner?: string;
 
-  @Field(() => OrderByInput, { nullable: true })
+  @Field({ nullable: true })
   @IsOptional()
   @IsString()
   readonly orderBy?: string;
@@ -38,4 +49,12 @@ export class ItemsConnectionArgs extends ConnectionArgs {
   @IsOptional()
   @IsString()
   readonly filterBy?: string;
+
+  @Field()
+  @IsBoolean()
+  readonly next: boolean;
+
+  @Field()
+  @IsBoolean()
+  readonly prev: boolean;
 }

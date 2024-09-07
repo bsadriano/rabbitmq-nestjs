@@ -26,15 +26,8 @@ export class AuthService {
     };
 
     const expires = new Date();
-    console.log(expires.toISOString());
 
     expires.setSeconds(expires.getSeconds() + 3600);
-    console.log(expires.toISOString());
-
-    // console.log(
-    //   expires.getSeconds(),
-    //   +expires.getSeconds() + this.configService.get<number>('jwt.expiration'),
-    // );
 
     const token = this.jwtService.sign(tokenPayload);
 

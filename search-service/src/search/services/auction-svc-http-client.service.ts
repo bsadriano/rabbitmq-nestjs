@@ -29,7 +29,7 @@ export class AuctionSvcHttpClientService {
       throw new Error('Argument cannot be null');
     }
 
-    var url = auctionURL + '/api/auctions';
+    var url = auctionURL + '/api/auctions/seed';
 
     // if (lastUpdated !== null && lastUpdated.updatedAt) {
     //   url += `?date=${format(lastUpdated.updatedAt, 'yyyy-MM-dd HH:mm:ss')}`;

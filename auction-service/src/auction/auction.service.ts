@@ -57,14 +57,19 @@ export class AuctionService {
     return savedAuction;
   }
 
-  async findAll(userId: number, date?: string) {
+  async findAll(userId?: number, date?: string) {
     const query = this.auctionRepository
       .createQueryBuilder('auction')
       .innerJoinAndSelect('auction.item', 'item')
-      .innerJoinAndSelect('auction.seller', 'seller', 'seller.id = :id', {
-        id: userId,
-      })
       .orderBy('item.make', 'ASC');
+
+    if (userId) {
+      query.innerJoinAndSelect('auction.seller', 'seller', 'seller.id = :id', {
+        id: userId,
+      });
+    } else {
+      query.leftJoinAndSelect('auction.seller', 'seller');
+    }
 
     if (date) {
       query.where(

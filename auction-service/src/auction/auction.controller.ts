@@ -42,6 +42,12 @@ export class AuctionController {
     return this.auctionService.create(createAuctionDto, user);
   }
 
+  @Get('seed')
+  @Serialize(AuctionDto)
+  getSeedData(@Query('date') date?: string) {
+    return this.auctionService.findAll(null, date);
+  }
+
   @Get()
   @Serialize(AuctionDto)
   // @UseGuards(JwtAuthGuard)

@@ -1,13 +1,19 @@
 import { create } from "zustand";
 
 type State = {
-  pageNumber: number;
-  pageSize: number;
+  first: number;
+  after: string;
+  before: string;
+  last: number;
   pageCount: number;
   searchTerm: string;
   searchValue: string;
   orderBy: string;
   filterBy: string;
+  next: boolean;
+  prev: boolean;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 };
 
 type Actions = {
@@ -17,23 +23,59 @@ type Actions = {
 };
 
 const initialState: State = {
-  pageNumber: 1,
-  pageSize: 12,
+  first: 4,
+  after: "",
+  before: "",
+  last: 4,
   pageCount: 1,
   searchTerm: "",
   searchValue: "",
   orderBy: "make",
-  filterBy: "live",
+  filterBy: "finished",
+  next: true,
+  prev: false,
+  hasNextPage: false,
+  hasPreviousPage: false,
 };
 
 export const useParamsStore = create<State & Actions>((set) => ({
   ...initialState,
   setParams: (newParams: Partial<State>) => {
     set((state) => {
-      if (newParams.pageNumber) {
-        return { ...state, pageNumber: newParams.pageNumber };
+      if (newParams.after) {
+        return {
+          ...state,
+          after: newParams.after,
+          next: newParams.next,
+          prev: newParams.prev,
+        };
+      } else if (newParams.before) {
+        return {
+          ...state,
+          before: newParams.before,
+          next: newParams.next,
+          prev: newParams.prev,
+        };
+      } else if (
+        Object.keys(newParams).some((key) =>
+          ["hasNextPage", "hasPreviousPage"].includes(key)
+        )
+      ) {
+        return {
+          ...state,
+          ...newParams,
+        };
       } else {
-        return { ...state, ...newParams, pageNumber: 1 };
+        return {
+          ...state,
+          ...newParams,
+          after: "",
+          before: "",
+          next: true,
+          prev: false,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        };
       }
     });
   },

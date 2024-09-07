@@ -1,29 +1,37 @@
 import { Injectable } from '@nestjs/common';
 // import { InjectModel } from '@nestjs/mongoose';
-import { Model, Schema as MongooseSchema } from 'mongoose';
-import { ConnectionArgs, findAndPaginate } from 'nestjs-graphql-relay';
+import { Model } from 'mongoose';
+import { getPagingParameters } from 'nestjs-graphql-relay';
 import { AuctionUpdated } from 'src/queue/dto/auction-updated';
-import { FindManyOptions, Repository } from 'typeorm';
 import { AuctionBidPlaced } from '../dto/auction-bid-placed.dto';
 import { AuctionFinished } from '../dto/auction-finished.dto';
 import { CreateItemInput } from '../dto/item.inputs';
 // import { Item } from '../item.schema';
-import { AuctionSvcHttpClientService } from './auction-svc-http-client.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Item } from '../entities/item.entity';
-
-// type PagedResult<T> = {
-//   results: T[];
-//   pageCount: number;
-//   totalCount: number;
-// };
+import { InjectModel } from '@nestjs/mongoose';
+import * as Relay from 'graphql-relay';
+import { ItemsConnectionArgs } from '../dto/items-connection.args';
+import { BiItemsConnection } from '../dto/items.dto';
+import { Item } from '../item.model';
+import { before } from 'node:test';
 
 @Injectable()
 export class SearchService {
+  async findBi(connArgs: ItemsConnectionArgs) {
+    const { next, prev } = connArgs;
+    const items: BiItemsConnection = {};
+
+    if (next) {
+      items.next = await this.findNext(connArgs);
+    }
+    if (prev) {
+      items.prev = await this.findPrevious(connArgs);
+    }
+
+    return items;
+  }
   constructor(
-    // @InjectModel(Item.name) private itemModel: Model<Item>,
+    @InjectModel(Item.name) private itemModel: Model<Item>,
     // private readonly auctionSvcHttpClientService: AuctionSvcHttpClientService,
-    @InjectRepository(Item) private itemRepository: Repository<Item>,
   ) {}
 
   async create(payload: CreateItemInput) {
@@ -34,104 +42,125 @@ export class SearchService {
     //   return await this.itemModel.countDocuments();
   }
 
-  async find(order: FindManyOptions<Item>['order'], connArgs: ConnectionArgs) {
-    return findAndPaginate({ order }, connArgs, this.itemRepository);
+  async findPrevious(connArgs: ItemsConnectionArgs) {
+    const { before, last } = connArgs;
+
+    if (before && last < 0) {
+      throw new Error('Invalid page number or page size');
+    }
+
+    const args = {
+      ...connArgs,
+      after: null,
+      first: null,
+    };
+
+    return this.find(args);
   }
 
-  // async getItems(args: GetItemArgs): Promise<Item[]> {
-  //   const {
-  //     searchTerm,
-  //     pageSize,
-  //     pageNumber,
-  //     seller,
-  //     winner,
-  //     orderBy,
-  //     filterBy,
-  //   } = args;
+  async findNext(connArgs: ItemsConnectionArgs) {
+    const { after, first } = connArgs;
 
-  //   if (pageNumber < 0 || pageSize <= 0) {
-  //     throw new Error('Invalid page number or page size');
-  //   }
+    if (after && first < 0) {
+      throw new Error('Invalid page number or page size');
+    }
 
-  //   let where = {};
-  //   if (searchTerm) {
-  //     where = {
-  //       $text: { $search: searchTerm },
-  //     };
-  //   }
+    const args = {
+      ...connArgs,
+      before: null,
+      last: null,
+    };
 
-  //   let order;
-  //   switch (orderBy) {
-  //     case 'make':
-  //       order = ['make', 1];
-  //       break;
-  //     case 'new':
-  //       order = ['createdAt', -1];
-  //       break;
-  //     default:
-  //       order = ['auctionEnd', -1];
-  //       break;
-  //   }
+    return this.find(args);
+  }
 
-  //   const now = new Date();
-  //   const sixHoursLater = new Date(now.getTime() + 6 * 60 * 60 * 1000); // 6 hours later
+  async find(connArgs: ItemsConnectionArgs) {
+    const { where, order } = this.getFilters(connArgs);
 
-  //   if (filterBy) {
-  //     switch (filterBy) {
-  //       case 'finished':
-  //         where = {
-  //           ...where,
-  //           auctionEnd: { $lt: now },
-  //         };
-  //         break;
-  //       case 'endingSoon':
-  //         where = {
-  //           ...where,
-  //           auctionEnd: { $lt: sixHoursLater, $gt: now },
-  //         };
-  //         break;
-  //       default:
-  //         where = {
-  //           ...where,
-  //           auctionEnd: { $gt: now },
-  //         };
-  //         break;
-  //     }
-  //   }
+    const { limit, offset } = getPagingParameters(connArgs);
 
-  //   if (seller) {
-  //     where = {
-  //       ...where,
-  //       seller,
-  //     };
-  //   }
+    const items = await this.itemModel
+      .find(where)
+      .sort([order])
+      .limit(limit)
+      .skip(offset);
 
-  //   if (winner) {
-  //     where = {
-  //       ...where,
-  //       winner,
-  //     };
-  //   }
+    const count = await this.itemModel.countDocuments();
 
-  //   const skip = (pageNumber - 1) * pageSize;
+    return Relay.connectionFromArraySlice(items, connArgs, {
+      arrayLength: count,
+      sliceStart: offset || 0,
+    });
+  }
 
-  //   // return this.itemModel.find();
-  //   console.log(args, where);
+  getFilters(connArgs: ItemsConnectionArgs) {
+    const { searchTerm, seller, winner, orderBy, filterBy } = connArgs;
 
-  //   // const totalCount = await this.itemModel.countDocuments();
-  //   // const pageCount = Math.ceil(totalCount / pageSize);
-  //   // return {
-  //   //   results,
-  //   //   pageCount,
-  //   //   totalCount,
-  //   // };
+    let where = {};
+    if (searchTerm) {
+      where = {
+        $text: { $search: searchTerm },
+      };
+    }
 
-  //   return this.itemModel.find(where).sort([order]).limit(pageSize).skip(skip);
-  // }
+    let order;
+    switch (orderBy) {
+      case 'make':
+        order = ['make', 1];
+        break;
+      case 'new':
+        order = ['createdAt', -1];
+        break;
+      default:
+        order = ['auctionEnd', -1];
+        break;
+    }
 
-  // async getItem(_id: MongooseSchema.Types.ObjectId): Promise<Item> {
-  //   return this.itemModel.findById(_id).exec();
-  // }
+    const now = new Date();
+    const sixHoursLater = new Date(now.getTime() + 6 * 60 * 60 * 1000); // 6 hours later
+
+    if (filterBy) {
+      switch (filterBy) {
+        case 'finished':
+          where = {
+            ...where,
+            auctionEnd: { $lt: now },
+          };
+          break;
+        case 'endingSoon':
+          where = {
+            ...where,
+            auctionEnd: { $lt: sixHoursLater, $gt: now },
+          };
+          break;
+        default:
+          where = {
+            ...where,
+            auctionEnd: { $gt: now },
+          };
+          break;
+      }
+    }
+
+    if (seller) {
+      where = {
+        ...where,
+        seller,
+      };
+    }
+
+    if (winner) {
+      where = {
+        ...where,
+        winner,
+      };
+    }
+
+    return {
+      where,
+      order,
+    };
+  }
 
   async update(data: AuctionUpdated) {
     //   return await this.itemModel.findOneAndUpdate({ id: data.id }, data, {

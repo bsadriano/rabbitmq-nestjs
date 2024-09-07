@@ -6,10 +6,10 @@ export type PagedResult<T> = {
 
 export type Auction = {
   reservePrice: number;
-  seller: string;
+  seller?: string | null | undefined;
   winner?: string;
-  soldAmount: number;
-  currentHighBid: any;
+  soldAmount?: number | null | undefined;
+  currentHighBid?: number | null | undefined;
   createdAt: string;
   updatedAt: string;
   auctionEnd: string;
@@ -20,5 +20,31 @@ export type Auction = {
   color: string;
   mileage: number;
   imageUrl: string;
-  id: number;
+  id: string;
+};
+
+export type AuctionEdge = {
+  cursor: string;
+  node: Auction;
+};
+
+export type AuctionConnection = {
+  next?: {
+    pageInfo: {
+      endCursor: string | null | undefined;
+      hasNextPage: boolean | null | undefined;
+      hasPreviousPage: boolean | null | undefined;
+      startCursor: string | null | undefined;
+    };
+    edges: AuctionEdge[];
+  } | null;
+  prev?: {
+    pageInfo: {
+      endCursor: string | null | undefined;
+      hasNextPage: boolean | null | undefined;
+      hasPreviousPage: boolean | null | undefined;
+      startCursor: string | null | undefined;
+    };
+    edges: AuctionEdge[];
+  } | null;
 };
