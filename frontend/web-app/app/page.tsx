@@ -1,9 +1,9 @@
-import Listings from "./auctions/Listings";
+import Listings from "./ui/auctions/Listings";
 
 export default function Home() {
   return (
-    <div>
+    <main className="container mx-auto px-5 pt-10">
       <Listings />
-    </div>
+    </main>
   );
 }

@@ -2,10 +2,10 @@ import { Field, Float, ID, Int, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class Item {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: number;
 
-  @Field((type) => Float)
+  @Field(() => Float)
   reservePrice: number;
 
   @Field({ nullable: true })
@@ -14,10 +14,10 @@ export class Item {
   @Field({ nullable: true })
   winner?: string;
 
-  @Field((type) => Float, { nullable: true })
+  @Field(() => Float, { nullable: true })
   soldAmount?: number;
 
-  @Field((type) => Float, { nullable: true })
+  @Field(() => Float, { nullable: true })
   currentHighBid?: number;
 
   @Field()
@@ -41,14 +41,9 @@ export class Item {
   @Field()
   color: string;
 
-  @Field((type) => Int)
+  @Field(() => Int)
   mileage: number;
 
   @Field()
   imageUrl: string;
-
-  // @Field(() => ID, { name: '_id' })
-  // get relayId(): string {
-  //   return toGlobalId('Item', this.id);
-  // }
 }

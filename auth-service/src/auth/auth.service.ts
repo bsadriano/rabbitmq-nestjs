@@ -7,6 +7,7 @@ import { catchError, of, tap, timeout } from 'rxjs';
 import { USER_SERVICE } from 'src/constants/services';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
+import { access } from 'fs';
 
 export interface TokenPayload {
   userId: number;
@@ -20,21 +21,34 @@ export class AuthService {
     @Inject(USER_SERVICE) private rabbitClient: ClientProxy,
   ) {}
 
-  async login(user: User, response: Response) {
-    const tokenPayload: TokenPayload = {
-      userId: user.id,
+  login(user: User, response: Response) {
+    const accessToken = this.generateToken(user.id);
+    const refreshToken = this.generateToken(user.id, 3600 * 24);
+
+    return {
+      ...user,
+      accessToken: accessToken.token,
+      refreshToken: refreshToken.token,
+    };
+  }
+
+  generateToken(userId: number, offset = 3600) {
+    const tokenPayload = {
+      userId,
     };
 
     const expires = new Date();
 
-    expires.setSeconds(expires.getSeconds() + 3600);
+    expires.setSeconds(expires.getSeconds() + offset);
 
-    const token = this.jwtService.sign(tokenPayload);
-
-    response.cookie('Authentication', token, {
-      httpOnly: true,
-      expires,
+    const token = this.jwtService.sign(tokenPayload, {
+      expiresIn: `${offset}s`,
     });
+
+    return {
+      expires,
+      token,
+    };
   }
 
   logout(response: Response) {

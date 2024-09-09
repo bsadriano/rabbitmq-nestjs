@@ -1,18 +1,15 @@
 "use client";
 
 import React from "react";
-import { useParamsStore } from "../hooks/useParamsStore";
+import { useParamsStore } from "@/app/hooks/useParamsStore";
 import { FaSearch } from "react-icons/fa";
 
-interface Props {}
-
-const Search = (props: Props) => {
+const Search = () => {
   const setParams = useParamsStore((state) => state.setParams);
   const setSearchValue = useParamsStore((state) => state.setSearchValue);
-  const searchTerm = useParamsStore((state) => state.searchTerm);
   const searchValue = useParamsStore((state) => state.searchValue);
 
-  function onChange(event: any) {
+  function onChange(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchValue(event.target.value);
   }
 
@@ -25,7 +22,7 @@ const Search = (props: Props) => {
       <input
         type="text"
         onChange={onChange}
-        onKeyDown={(e: any) => {
+        onKeyDown={(e) => {
           if (e.key === "Enter") search();
         }}
         value={searchValue}

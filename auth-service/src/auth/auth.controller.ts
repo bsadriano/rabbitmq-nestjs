@@ -17,6 +17,9 @@ import { Response } from 'express';
 import JwtAuthGuard from './guards/jwt-auth.guard';
 import { Ctx, MessagePattern, RmqContext } from '@nestjs/microservices';
 import { RmqService } from 'src/rmq/rmq.service';
+import { Serialize } from 'src/interceptors/serialize.interceptor';
+import { UserDto } from './dto/user.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('api/auth')
 export class AuthController {
@@ -25,16 +28,17 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly rmqService: RmqService,
+    private readonly jwtService: JwtService,
   ) {}
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
+  @Serialize(UserDto)
   async login(
     @CurrentUser() user: User,
     @Res({ passthrough: true }) response: Response,
   ) {
-    await this.authService.login(user, response);
-    response.send(user);
+    response.send(this.authService.login(user, response));
   }
 
   @Get('users')

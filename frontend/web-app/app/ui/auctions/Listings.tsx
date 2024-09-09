@@ -1,24 +1,23 @@
 "use client";
 
+import { AuctionConnection } from "@/app/lib/definitions";
 import { useEffect, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
-import { useParamsStore } from "../hooks/useParamsStore";
-import { Auction, AuctionConnection, PagedResult } from "../types";
+import { useParamsStore } from "@/app/hooks/useParamsStore";
 
-import qs from "query-string";
-import AppPagination from "../components/AppPagination";
-import EmptyFilter from "../components/EmptyFilter";
+import { getData } from "@/app/actions/auctionActions";
+import EmptyFilter from "./EmptyFilter";
 import AuctionCard from "./AuctionCard";
 import Filters from "./Filters";
-import { getData } from "../actions/auctionActions";
+import { useSession } from "next-auth/react";
 
-interface Props {}
-
-const Listings = (props: Props) => {
+const Listings = () => {
   const [data, setData] = useState<AuctionConnection>();
 
   const hasNextPage = useParamsStore((state) => state.hasNextPage);
   const hasPreviousPage = useParamsStore((state) => state.hasPreviousPage);
+
+  const { data: session, status } = useSession();
 
   const params = useParamsStore(
     useShallow((state) => ({
@@ -31,11 +30,11 @@ const Listings = (props: Props) => {
       filterBy: state.filterBy,
       next: state.next,
       prev: state.prev,
+      seller: session?.user.name ?? "",
     }))
   );
 
   const setParams = useParamsStore((state) => state.setParams);
-  const url = qs.stringifyUrl({ url: "", query: params });
 
   function setAfter(after: string) {
     setParams({ after, next: true, prev: false });
@@ -55,7 +54,7 @@ const Listings = (props: Props) => {
       });
       setData(data);
     });
-  }, [params]);
+  }, [params, hasNextPage, hasPreviousPage, setParams]);
 
   const fetchPrevious = () => {
     setParams({
@@ -78,7 +77,7 @@ const Listings = (props: Props) => {
   const currData = data?.next ? data?.next : data?.prev ? data?.prev : null;
   const edges = currData ? currData.edges : [];
 
-  if (!data) return <h3>Loading...</h3>;
+  if (!data || status === "loading") return <h3>Loading...</h3>;
 
   return (
     <>

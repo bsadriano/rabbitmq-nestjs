@@ -1,5 +1,5 @@
 import React from "react";
-import { Auction } from "../types";
+import { Auction } from "@/app/lib/definitions";
 import CarImage from "./CarImage";
 import CountdownTimer from "./CountdownTimer";
 

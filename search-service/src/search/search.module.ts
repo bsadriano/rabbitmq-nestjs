@@ -10,7 +10,6 @@ import { SearchService } from './services/search.service';
 @Module({
   imports: [
     HttpModule,
-    // TypeOrmModule.forFeature([Item]),
     MongooseModule.forFeature([{ name: Item.name, schema: itemSchema }]),
     AuthModule,
   ],

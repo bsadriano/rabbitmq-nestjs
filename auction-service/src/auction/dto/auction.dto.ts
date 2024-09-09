@@ -1,12 +1,10 @@
 import { Expose, Transform } from 'class-transformer';
+import { capitalizeFirstLetter } from 'src/utils/string';
 import { AuctionStatus } from '../entities/auction-status.enum';
 import { Auction } from '../entities/auction.entity';
 
 const getFullName = (firstName: string, lastName: string) =>
   `${capitalizeFirstLetter(firstName)} ${capitalizeFirstLetter(lastName)}`;
-
-const capitalizeFirstLetter = (string: string) =>
-  string.charAt(0).toUpperCase() + string.slice(1);
 
 export class AuctionDto {
   @Expose()

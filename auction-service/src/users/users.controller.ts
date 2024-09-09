@@ -18,6 +18,8 @@ import { RmqService } from 'src/rmq/rmq.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
+import { Serialize } from 'src/interceptors/serialize.interceptor';
+import { UserDto } from './dto/user.dto';
 
 @Controller()
 export class UsersController {
@@ -53,6 +55,7 @@ export class UsersController {
   }
 
   @MessagePattern({ cmd: 'validate-user' })
+  @Serialize(UserDto)
   async handleValidateUser(
     @Payload() data: { email: string; password: string },
     @Ctx() ctx: RmqContext,

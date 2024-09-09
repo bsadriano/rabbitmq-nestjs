@@ -1,7 +1,6 @@
-import { ItemsConnection } from "@/gql/graphql";
-import { graphql } from "../../gql";
-import { Auction, AuctionConnection, PagedResult } from "../types";
 import { graphqlClient } from "@/lib/graphql-client";
+import { graphql } from "../../gql";
+import { AuctionConnection } from "../types";
 
 const GetAllItemsDocument = graphql(`
   query GetAllItemsQuery(

@@ -50,10 +50,9 @@ export class AuctionController {
 
   @Get()
   @Serialize(AuctionDto)
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   findAll(@CurrentUser() user: User, @Query('date') date?: string) {
-    // return this.auctionService.findAll(user.id, date);
-    return this.auctionService.findAll(18, date);
+    return this.auctionService.findAll(user.id, date);
   }
 
   @Get(':id')

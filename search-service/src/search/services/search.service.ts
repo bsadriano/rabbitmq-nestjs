@@ -1,21 +1,32 @@
-import { Injectable } from '@nestjs/common';
-// import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import * as Relay from 'graphql-relay';
 import { Model } from 'mongoose';
 import { getPagingParameters } from 'nestjs-graphql-relay';
 import { AuctionUpdated } from 'src/queue/dto/auction-updated';
 import { AuctionBidPlaced } from '../dto/auction-bid-placed.dto';
 import { AuctionFinished } from '../dto/auction-finished.dto';
 import { CreateItemInput } from '../dto/item.inputs';
-// import { Item } from '../item.schema';
-import { InjectModel } from '@nestjs/mongoose';
-import * as Relay from 'graphql-relay';
 import { ItemsConnectionArgs } from '../dto/items-connection.args';
 import { BiItemsConnection } from '../dto/items.dto';
 import { Item } from '../item.model';
-import { before } from 'node:test';
+import { AuctionSvcHttpClientService } from './auction-svc-http-client.service';
 
 @Injectable()
 export class SearchService {
+  constructor(
+    @InjectModel(Item.name) private itemModel: Model<Item>,
+    private readonly auctionSvcHttpClientService: AuctionSvcHttpClientService,
+  ) {}
+
+  async create(payload: CreateItemInput) {
+    return await this.itemModel.create(payload);
+  }
+
+  async getCount() {
+    return await this.itemModel.countDocuments();
+  }
+
   async findBi(connArgs: ItemsConnectionArgs) {
     const { next, prev } = connArgs;
     const items: BiItemsConnection = {};
@@ -29,17 +40,21 @@ export class SearchService {
 
     return items;
   }
-  constructor(
-    @InjectModel(Item.name) private itemModel: Model<Item>,
-    // private readonly auctionSvcHttpClientService: AuctionSvcHttpClientService,
-  ) {}
 
-  async create(payload: CreateItemInput) {
-    //   return await this.itemModel.create(payload);
-  }
+  async findNext(connArgs: ItemsConnectionArgs) {
+    const { after, first } = connArgs;
 
-  async getCount() {
-    //   return await this.itemModel.countDocuments();
+    if (after && first < 0) {
+      throw new Error('Invalid page number or page size');
+    }
+
+    const args = {
+      ...connArgs,
+      before: null,
+      last: null,
+    };
+
+    return this.find(args);
   }
 
   async findPrevious(connArgs: ItemsConnectionArgs) {
@@ -53,22 +68,6 @@ export class SearchService {
       ...connArgs,
       after: null,
       first: null,
-    };
-
-    return this.find(args);
-  }
-
-  async findNext(connArgs: ItemsConnectionArgs) {
-    const { after, first } = connArgs;
-
-    if (after && first < 0) {
-      throw new Error('Invalid page number or page size');
-    }
-
-    const args = {
-      ...connArgs,
-      before: null,
-      last: null,
     };
 
     return this.find(args);
@@ -163,46 +162,46 @@ export class SearchService {
   }
 
   async update(data: AuctionUpdated) {
-    //   return await this.itemModel.findOneAndUpdate({ id: data.id }, data, {
-    //     new: true,
-    //   });
+    return await this.itemModel.findOneAndUpdate({ id: data.id }, data, {
+      new: true,
+    });
   }
 
   async deleteById(id: number) {
-    //   return await this.itemModel.findOneAndDelete({ id });
+    return await this.itemModel.findOneAndDelete({ id });
   }
 
   async finishAuction({ id, itemSold, soldAmount, winner }: AuctionFinished) {
-    //   const auction = await this.itemModel.findById({
-    //     id,
-    //   });
-    //   if (!auction) {
-    //     throw new NotFoundException(`Auction with id #${id} not found`);
-    //   }
-    //   const update: any = {};
-    //   if (itemSold) {
-    //     update.winner = winner;
-    //     update.soldAmount = soldAmount;
-    //   }
-    //   update.status = 'Finished';
-    //   await this.itemModel.updateOne({ id }, update);
+    const auction = await this.itemModel.findById({
+      id,
+    });
+    if (!auction) {
+      throw new NotFoundException(`Auction with id #${id} not found`);
+    }
+    const update: any = {};
+    if (itemSold) {
+      update.winner = winner;
+      update.soldAmount = soldAmount;
+    }
+    update.status = 'Finished';
+    await this.itemModel.updateOne({ id }, update);
   }
 
   async placeBid({ id, amount, bidStatus, currentHighBid }: AuctionBidPlaced) {
-    //   const auction = await this.itemModel.findById({
-    //     id,
-    //   });
-    //   if (!auction) {
-    //     throw new NotFoundException(`Auction with id #${id} not found`);
-    //   }
-    //   const update: any = {};
-    //   if (
-    //     auction.currentHighBid == null ||
-    //     (bidStatus.includes('Accepted') && amount > auction.currentHighBid)
-    //   ) {
-    //     update.currentHighBid = amount;
-    //   }
-    //   update.status = 'Finished';
-    //   await this.itemModel.updateOne({ id }, update);
+    const auction = await this.itemModel.findById({
+      id,
+    });
+    if (!auction) {
+      throw new NotFoundException(`Auction with id #${id} not found`);
+    }
+    const update: any = {};
+    if (
+      auction.currentHighBid == null ||
+      (bidStatus.includes('Accepted') && amount > auction.currentHighBid)
+    ) {
+      update.currentHighBid = amount;
+    }
+    update.status = 'Finished';
+    await this.itemModel.updateOne({ id }, update);
   }
 }

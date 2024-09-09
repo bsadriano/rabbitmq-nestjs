@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { ClientProxy } from '@nestjs/microservices';
+import { Request } from 'express';
 import { catchError, Observable, tap, timeout } from 'rxjs';
 import { AUTH_SERVICE } from 'src/constants/services';
 
@@ -41,8 +42,8 @@ export class JwtAuthGuard implements CanActivate {
     if (context.getType() === 'rpc') {
       authentication = context.switchToRpc().getData().Authentication;
     } else if (context.getType() === 'http') {
-      authentication = context.switchToHttp().getRequest()
-        .cookies?.Authentication;
+      const request = context.switchToHttp().getRequest<Request>();
+      authentication = request.header('Authorization');
     } // @ts-ignore
     else if (context.getType() === 'graphql') {
       const ctx = GqlExecutionContext.create(context);
