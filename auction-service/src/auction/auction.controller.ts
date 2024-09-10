@@ -58,8 +58,8 @@ export class AuctionController {
   @Get(':id')
   @Serialize(AuctionDto)
   @UseGuards(JwtAuthGuard)
-  findOne(@CurrentUser() user: User, @Param('id') id: string) {
-    return this.auctionService.findOne(user.id, +id);
+  findOne(@Param('id') id: string) {
+    return this.auctionService.findOne(+id);
   }
 
   @Patch(':id')
@@ -75,8 +75,8 @@ export class AuctionController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  remove(@CurrentUser() user: User, @Param('id') id: string) {
-    return this.auctionService.remove(user.id, +id);
+  remove(@Param('id') id: string) {
+    return this.auctionService.remove(+id);
   }
 
   @EventPattern('auction-finished')

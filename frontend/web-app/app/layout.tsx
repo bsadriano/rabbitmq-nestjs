@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import NavBar from "./ui/nav/NavBar";
+import NavBar from "./ui/nav/navbar";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
+import { Toaster } from "react-hot-toast";
 
 export const expiremental_ppr = true;
 
@@ -21,6 +22,7 @@ export default async function RootLayout({
     <html lang="en">
       <body>
         <SessionProvider session={session}>
+          <Toaster position="bottom-right" />
           <NavBar />
           <main className="container mx-auto px-5 pt-10">{children}</main>
         </SessionProvider>

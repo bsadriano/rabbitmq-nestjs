@@ -7,7 +7,6 @@ import { catchError, of, tap, timeout } from 'rxjs';
 import { USER_SERVICE } from 'src/constants/services';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
-import { access } from 'fs';
 
 export interface TokenPayload {
   userId: number;
@@ -21,9 +20,12 @@ export class AuthService {
     @Inject(USER_SERVICE) private rabbitClient: ClientProxy,
   ) {}
 
-  login(user: User, response: Response) {
+  login(user: User) {
     const accessToken = this.generateToken(user.id);
-    const refreshToken = this.generateToken(user.id, 3600 * 24);
+    const refreshToken = this.generateToken(
+      user.id,
+      this.configService.get<number>('jwt.refresh_expiration'),
+    );
 
     return {
       ...user,
@@ -32,7 +34,10 @@ export class AuthService {
     };
   }
 
-  generateToken(userId: number, offset = 3600) {
+  generateToken(
+    userId: number,
+    offset = this.configService.get<number>('jwt.access_expiration'),
+  ) {
     const tokenPayload = {
       userId,
     };
@@ -97,5 +102,16 @@ export class AuthService {
         password,
       },
     );
+  }
+
+  refresh(token: string) {
+    const { userId } = this.jwtService.decode(token);
+    const accessToken = this.generateToken(userId);
+    const refreshToken = this.generateToken(userId, 3600 * 24);
+
+    return {
+      accessToken: accessToken.token,
+      refreshToken: refreshToken.token,
+    };
   }
 }

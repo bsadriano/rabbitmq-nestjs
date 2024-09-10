@@ -1,10 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Countdown, { zeroPad } from "react-countdown";
 
 interface Props {
-  auctionEnd: string;
+  auctionEnd: string | number;
 }
 
 interface RendererProps {
@@ -14,6 +14,14 @@ interface RendererProps {
   seconds: number;
   completed: boolean;
 }
+
+const Skeleteon = () => {
+  return (
+    <div className="border-2 border-white text-white py-1 px-2 rounded-lg flex justify-center bg-gray-300">
+      <span>00:00:00:00</span>
+    </div>
+  );
+};
 
 const renderer = ({
   days,
@@ -41,10 +49,20 @@ const renderer = ({
   </div>
 );
 
-const CountdownTimer = ({ auctionEnd }: Props) => (
-  <div>
-    <Countdown date={new Date(parseInt(auctionEnd))} renderer={renderer} />
-  </div>
-);
+const CountdownTimer = ({ auctionEnd }: Props) => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (isClient === false) return <Skeleteon />;
+
+  return (
+    <div>
+      <Countdown date={new Date(+auctionEnd)} renderer={renderer} />
+    </div>
+  );
+};
 
 export default CountdownTimer;

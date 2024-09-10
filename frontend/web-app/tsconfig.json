@@ -29,7 +29,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "app/ui/auctions/details/detailed-specs.tsax"  ],
   "exclude": [
     "node_modules"
   ]

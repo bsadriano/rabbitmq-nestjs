@@ -83,14 +83,11 @@ export class AuctionService {
     return query.getMany();
   }
 
-  async findOne(userId: number, id: number) {
+  async findOne(id: number) {
     const auction = await this.auctionRepository.findOne({
       relations: ['item', 'seller'],
       where: {
         id,
-        seller: {
-          id: userId,
-        },
       },
     });
 
@@ -130,8 +127,8 @@ export class AuctionService {
     return existingAuction;
   }
 
-  async remove(userId: number, id: number) {
-    const auction = await this.findOne(userId, id);
+  async remove(id: number) {
+    const auction = await this.findOne(id);
 
     this.auctionRepository.remove(auction);
 

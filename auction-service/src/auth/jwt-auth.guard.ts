@@ -43,11 +43,14 @@ export class JwtAuthGuard implements CanActivate {
       authentication = context.switchToRpc().getData().Authentication;
     } else if (context.getType() === 'http') {
       const request = context.switchToHttp().getRequest<Request>();
-      authentication = request.header('Authorization');
-    } // @ts-ignore
+      const authHeader = request.header('Authorization');
+      if (authHeader) {
+        authentication = authHeader.split(' ')[1];
+      }
+    } // @ts-expect-error graphql not in context types yet
     else if (context.getType() === 'graphql') {
       const ctx = GqlExecutionContext.create(context);
-      authentication = ctx.getContext().req.cookies.Authentication;
+      authentication = ctx.getContext().req.headers['authorization'];
     }
 
     if (!authentication) {
@@ -63,7 +66,7 @@ export class JwtAuthGuard implements CanActivate {
       context.switchToRpc().getData().user = user;
     } else if (context.getType() === 'http') {
       context.switchToHttp().getRequest().user = user;
-    } // @ts-ignore
+    } // @ts-expect-error graphql not in context types yet
     else if (context.getType() === 'graphql') {
       const ctx = GqlExecutionContext.create(context);
       ctx.getContext().req.user = user;

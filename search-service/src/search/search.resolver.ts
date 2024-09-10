@@ -1,4 +1,6 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Query, Resolver } from '@nestjs/graphql';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ItemsConnectionArgs } from './dto/items-connection.args';
 import { BiItemsConnection, ItemsConnection } from './dto/items.dto';
 import { Item } from './item.model';
@@ -14,6 +16,7 @@ export class SearchResolver {
   }
 
   @Query(() => BiItemsConnection)
+  @UseGuards(JwtAuthGuard)
   async biItems(@Args() args: ItemsConnectionArgs): Promise<BiItemsConnection> {
     return this.searchService.findBi(args);
   }

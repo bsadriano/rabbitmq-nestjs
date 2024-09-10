@@ -5,11 +5,12 @@ import { useEffect, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { useParamsStore } from "@/app/hooks/useParamsStore";
 
-import { getData } from "@/app/actions/auctionActions";
-import EmptyFilter from "./EmptyFilter";
-import AuctionCard from "./AuctionCard";
-import Filters from "./Filters";
+import { getData } from "@/app/actions/auction.actions";
+import EmptyFilter from "./empty-filter";
+import AuctionCard from "./auction-card";
+import Filters from "./filters";
 import { useSession } from "next-auth/react";
+import clsx from "clsx";
 
 const Listings = () => {
   const [data, setData] = useState<AuctionConnection>();
@@ -30,7 +31,9 @@ const Listings = () => {
       filterBy: state.filterBy,
       next: state.next,
       prev: state.prev,
-      seller: session?.user.name ?? "",
+      // seller: session?.user.name ?? "",
+      seller: state.seller,
+      winner: state.winner,
     }))
   );
 
@@ -93,14 +96,20 @@ const Listings = () => {
           </div>
           <div className="flex justify-center mt-4">
             <button
-              className="px-4 py-2 bg-blue-500 text-white rounded my-10 hover:bg-blue-700 mr-2"
+              className={clsx("px-4 py-2 text-white rounded my-10 mr-2", {
+                "bg-blue-300": !hasPreviousPage,
+                "bg-blue-500 hover:bg-blue-700": hasPreviousPage,
+              })}
               disabled={!hasPreviousPage}
               onClick={fetchPrevious}
             >
               Previous
             </button>
             <button
-              className="px-4 py-2 bg-blue-500 text-white rounded my-10 hover:bg-blue-700"
+              className={clsx("px-4 py-2 text-white rounded my-10", {
+                "bg-blue-300": !hasNextPage,
+                "bg-blue-500 hover:bg-blue-700": hasNextPage,
+              })}
               disabled={!hasNextPage}
               onClick={fetchNext}
             >

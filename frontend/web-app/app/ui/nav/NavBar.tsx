@@ -1,7 +1,7 @@
-import { getCurrentUser } from "@/app/actions/authActions";
-import Logo from "./Logo";
-import Search from "./Search";
-import UserActions from "./UserActions";
+import { getCurrentUser } from "@/app/actions/auth.actions";
+import Logo from "./logo";
+import Search from "./search";
+import UserActions from "./user-actions";
 
 export default async function NavBar() {
   const user = await getCurrentUser();

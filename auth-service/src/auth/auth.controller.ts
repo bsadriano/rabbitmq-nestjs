@@ -38,7 +38,12 @@ export class AuthController {
     @CurrentUser() user: User,
     @Res({ passthrough: true }) response: Response,
   ) {
-    response.send(this.authService.login(user, response));
+    response.send(this.authService.login(user));
+  }
+
+  @Post('refresh-token')
+  async refresh(@Body('token') token: string) {
+    return this.authService.refresh(token);
   }
 
   @Get('users')

@@ -1,14 +1,18 @@
+import { AppUser } from "@/app/lib/definitions";
 import { DefaultSession } from "next-auth";
 
 declare module "next-auth" {
   interface Session {
-    user: {
-      username: string;
-    } & DefaultSession["user"];
+    user: AppUser & DefaultSession["user"];
     accessToken: string;
+    refreshToken: string;
   }
 
   interface Profile {
+    username: string;
+  }
+
+  interface User {
     username: string;
   }
 }

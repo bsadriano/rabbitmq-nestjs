@@ -11,6 +11,7 @@ import { ItemsConnectionArgs } from '../dto/items-connection.args';
 import { BiItemsConnection } from '../dto/items.dto';
 import { Item } from '../item.model';
 import { AuctionSvcHttpClientService } from './auction-svc-http-client.service';
+import { clear } from 'console';
 
 @Injectable()
 export class SearchService {
@@ -84,7 +85,7 @@ export class SearchService {
       .limit(limit)
       .skip(offset);
 
-    const count = await this.itemModel.countDocuments();
+    const count = await this.itemModel.countDocuments(where);
 
     return Relay.connectionFromArraySlice(items, connArgs, {
       arrayLength: count,

@@ -8,7 +8,7 @@ import {
   KeyIcon,
 } from "@heroicons/react/24/outline";
 import { useActionState } from "react";
-import { authenticate } from "../actions/authActions";
+import { authenticate } from "../actions/auth.actions";
 import { Button } from "../ui/button";
 
 export default function Page() {

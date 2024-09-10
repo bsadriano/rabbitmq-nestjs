@@ -1,6 +1,12 @@
+"use server";
+
+import { auth } from "@/auth";
 import { graphqlClient } from "@/lib/graphql-client";
+import { revalidatePath } from "next/cache";
+import { FieldValues } from "react-hook-form";
 import { graphql } from "../../gql";
-import { AuctionConnection } from "../types";
+import agent, { ErrorResponse } from "../lib/agent";
+import { Auction, AuctionConnection } from "../types";
 
 const GetAllItemsDocument = graphql(`
   query GetAllItemsQuery(
@@ -106,7 +112,9 @@ type Params = {
 
 export const getData = async (params: Params): Promise<AuctionConnection> => {
   try {
-    const { biItems } = await graphqlClient.request(
+    const session = await auth();
+    const token = session?.accessToken ?? "";
+    const { biItems } = await graphqlClient(token).request(
       GetAllItemsDocument,
       params
     );
@@ -165,7 +173,7 @@ export const getData = async (params: Params): Promise<AuctionConnection> => {
 
     return items;
   } catch (err: any) {
-    console.log(err.message);
+    // console.log(err.message);
 
     return {
       next: null,
@@ -173,3 +181,24 @@ export const getData = async (params: Params): Promise<AuctionConnection> => {
     };
   }
 };
+
+export async function createAuction(data: FieldValues) {
+  return await agent.Auctions.create(data);
+}
+
+export async function getDetailedViewData(
+  id: string
+): Promise<Auction | ErrorResponse> {
+  return await agent.Auctions.show(id);
+}
+
+export async function updateAuction(id: string, data: FieldValues) {
+  // export async function updateAuction(id: string, data: FieldValues) {
+  const res = await agent.Auctions.update(id, data);
+  revalidatePath(`/auctions/${id}`);
+  return res;
+}
+
+export async function deleteAuction(id: string) {
+  return await agent.Auctions.delete(id);
+}

@@ -48,3 +48,11 @@ export type AuctionConnection = {
     edges: AuctionEdge[];
   } | null;
 };
+
+export type AppUser = {
+  username: string;
+  firstName: string;
+  lastName: string;
+  accessToken: string;
+  refreshToken: string;
+};

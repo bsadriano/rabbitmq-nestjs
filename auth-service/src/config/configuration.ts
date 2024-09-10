@@ -9,7 +9,8 @@ export default () => ({
     synchronize: process.env.DATABASE_SYNCHRONIZE,
   },
   jwt: {
-    expiration: process.env.JWT_EXPIRATION,
+    access_expiration: process.env.JWT_ACCESS_EXPIRATION,
+    refresh_expiration: process.env.JWT_REFRESH_EXPIRATION,
     secret: process.env.JWT_SECRET,
   },
   rmq: {

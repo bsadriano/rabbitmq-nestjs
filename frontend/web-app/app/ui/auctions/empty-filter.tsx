@@ -1,7 +1,7 @@
 import React from "react";
 import { useParamsStore } from "@/app/hooks/useParamsStore";
 import { Button } from "flowbite-react";
-import Heading from "./Heading";
+import Heading from "./heading";
 import { signIn } from "next-auth/react";
 
 interface Props {

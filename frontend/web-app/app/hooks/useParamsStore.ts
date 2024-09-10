@@ -10,6 +10,8 @@ type State = {
   searchValue: string;
   orderBy: string;
   filterBy: string;
+  seller?: string;
+  winner?: string;
   next: boolean;
   prev: boolean;
   hasNextPage: boolean;
@@ -31,7 +33,9 @@ const initialState: State = {
   searchTerm: "",
   searchValue: "",
   orderBy: "make",
-  filterBy: "finished",
+  filterBy: "live",
+  seller: undefined,
+  winner: undefined,
   next: true,
   prev: false,
   hasNextPage: false,
