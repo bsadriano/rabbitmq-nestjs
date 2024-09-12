@@ -1,13 +1,15 @@
+import {
+  AuctionCreatedDto,
+  AuctionDeletedDto,
+  AuctionUpdatedDto,
+  RmqService,
+} from '@bsadriano/rmq-nestjs-lib';
 import { Controller, Logger } from '@nestjs/common';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
-import { SearchService } from 'src/search/services/search.service';
-import { CreateItemInput } from 'src/search/dto/item.inputs';
-import { RmqService } from 'src/rmq/rmq.service';
-import { AuctionCreated } from './dto/auction-created.dto';
-import { AuctionUpdated } from './dto/auction-updated';
-import { AuctionDeleted } from './dto/auction-deleted.dto';
-import { AuctionFinished } from 'src/search/dto/auction-finished.dto';
 import { AuctionBidPlaced } from 'src/search/dto/auction-bid-placed.dto';
+import { AuctionFinished } from 'src/search/dto/auction-finished.dto';
+import { CreateItemInput } from 'src/search/dto/item.inputs';
+import { SearchService } from 'src/search/services/search.service';
 
 @Controller()
 export class QueueController {
@@ -20,7 +22,7 @@ export class QueueController {
 
   @EventPattern('auction-created')
   async handleAuctionCreated(
-    @Payload() data: AuctionCreated,
+    @Payload() data: AuctionCreatedDto,
     @Ctx() context: RmqContext,
   ) {
     this.logger.verbose(
@@ -39,7 +41,7 @@ export class QueueController {
 
   @EventPattern('auction-updated')
   async handleAuctionUpdated(
-    @Payload() data: AuctionUpdated,
+    @Payload() data: AuctionUpdatedDto,
     @Ctx() context: RmqContext,
   ) {
     this.logger.verbose(
@@ -55,7 +57,7 @@ export class QueueController {
 
   @EventPattern('auction-deleted')
   async handleAuctionDeleted(
-    @Payload() { id }: AuctionDeleted,
+    @Payload() { id }: AuctionDeletedDto,
     @Ctx() context: RmqContext,
   ) {
     this.logger.verbose(`Handling auction deleted with id #${id}`);

@@ -1,8 +1,8 @@
+import { RmqModule } from '@bsadriano/rmq-nestjs-lib';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { USER_QUEUE, USER_SERVICE } from 'src/constants/services';
-import { RmqModule } from 'src/rmq/rmq.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';

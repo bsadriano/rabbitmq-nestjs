@@ -1,4 +1,10 @@
 import {
+  CurrentUser,
+  JwtAuthGuard,
+  RmqService,
+  Serialize,
+} from '@bsadriano/rmq-nestjs-lib';
+import {
   Body,
   Controller,
   Delete,
@@ -11,14 +17,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
-import { CurrentUser } from 'src/auth/current-user.decorator';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { Serialize } from 'src/interceptors/serialize.interceptor';
-import { RmqService } from 'src/rmq/rmq.service';
 import { User } from 'src/users/entities/user.entity';
 import { AuctionService } from './auction.service';
-import { AuctionBidPlaced } from './dto/auction-bid-placed.dto';
-import { AuctionFinished } from './dto/auction-finished.dto';
+import {
+  AuctionBidPlacedDto,
+  AuctionFinishedDto,
+} from '@bsadriano/rmq-nestjs-lib';
 import { AuctionDto } from './dto/auction.dto';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
@@ -81,7 +85,7 @@ export class AuctionController {
 
   @EventPattern('auction-finished')
   async handleAuctionFinished(
-    @Payload() auctionFinished: AuctionFinished,
+    @Payload() auctionFinished: AuctionFinishedDto,
     @Ctx() context: RmqContext,
   ) {
     this.logger.verbose('Consuming auction finished');
@@ -93,7 +97,7 @@ export class AuctionController {
 
   @EventPattern('auction-bid-placed')
   async handleBidPlaced(
-    @Payload() auctionBidPlaced: AuctionBidPlaced,
+    @Payload() auctionBidPlaced: AuctionBidPlacedDto,
     @Ctx() context: RmqContext,
   ) {
     this.logger.verbose('Consuming bid placed');

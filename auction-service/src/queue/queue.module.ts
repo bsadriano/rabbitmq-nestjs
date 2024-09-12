@@ -1,6 +1,6 @@
+import { RmqModule } from '@bsadriano/rmq-nestjs-lib';
 import { Module } from '@nestjs/common';
 import { AUCTION_QUEUE, AUCTION_SERVICE } from 'src/constants/services';
-import { RmqModule } from 'src/rmq/rmq.module';
 import { ProducerService } from './services/producer.service';
 
 @Module({

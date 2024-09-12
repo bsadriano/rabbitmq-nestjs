@@ -1,4 +1,6 @@
+import { RmqService } from '@bsadriano/rmq-nestjs-lib';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import {
@@ -6,8 +8,6 @@ import {
   AUCTION_FINISHED_QUEUE,
   AUCTION_QUEUE,
 } from './constants/services';
-import { RmqService } from './rmq/rmq.service';
-import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

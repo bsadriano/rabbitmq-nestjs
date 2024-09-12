@@ -24,7 +24,9 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
           )
           .pipe(
             timeout(5000),
-            catchError((error) => of('Error handled: ' + error.message)),
+            catchError((error) =>
+              of<any>({ error: 'Error handled: ' + error.message }),
+            ),
           ),
       );
 

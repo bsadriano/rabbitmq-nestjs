@@ -1,5 +1,5 @@
+import { getFullName } from '@bsadriano/rmq-nestjs-lib';
 import { Expose, Transform } from 'class-transformer';
-import { capitalizeFirstLetter } from 'src/utils/string';
 import { User } from '../entities/user.entity';
 
 export class UserDto {
@@ -19,9 +19,8 @@ export class UserDto {
   lastName: string;
 
   @Expose()
-  @Transform(
-    ({ obj }: { obj: User }) =>
-      `${capitalizeFirstLetter(obj.firstName)} ${capitalizeFirstLetter(obj.lastName)}`,
+  @Transform(({ obj }: { obj: User }) =>
+    getFullName(obj.firstName, obj.lastName),
   )
   name: string;
 }

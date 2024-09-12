@@ -1,10 +1,7 @@
 import { Expose, Transform } from 'class-transformer';
-import { capitalizeFirstLetter } from 'src/utils/string';
+import { getFullName } from '@bsadriano/rmq-nestjs-lib';
 import { AuctionStatus } from '../entities/auction-status.enum';
 import { Auction } from '../entities/auction.entity';
-
-const getFullName = (firstName: string, lastName: string) =>
-  `${capitalizeFirstLetter(firstName)} ${capitalizeFirstLetter(lastName)}`;
 
 export class AuctionDto {
   @Expose()

@@ -1,3 +1,4 @@
+import { RmqService, Serialize } from '@bsadriano/rmq-nestjs-lib';
 import {
   Body,
   Controller,
@@ -8,18 +9,16 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import LocalAuthGuard from './guards/local-auth.guard';
-import { CurrentUser } from './current-user.decorator';
-import { User } from './entities/user.entity';
-import { Response } from 'express';
-import JwtAuthGuard from './guards/jwt-auth.guard';
-import { Ctx, MessagePattern, RmqContext } from '@nestjs/microservices';
-import { RmqService } from 'src/rmq/rmq.service';
-import { Serialize } from 'src/interceptors/serialize.interceptor';
-import { UserDto } from './dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
+import { Ctx, MessagePattern, RmqContext } from '@nestjs/microservices';
+import { Response } from 'express';
+import { AuthService } from './auth.service';
+import { CurrentUser } from './current-user.decorator';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UserDto } from './dto/user.dto';
+import { User } from './entities/user.entity';
+import JwtAuthGuard from './guards/jwt-auth.guard';
+import LocalAuthGuard from './guards/local-auth.guard';
 
 @Controller('api/auth')
 export class AuthController {
@@ -35,10 +34,16 @@ export class AuthController {
   @Post('login')
   @Serialize(UserDto)
   async login(
-    @CurrentUser() user: User,
+    @CurrentUser() user: User | { error: string },
     @Res({ passthrough: true }) response: Response,
   ) {
-    response.send(this.authService.login(user));
+    if (user instanceof User) {
+      response.send(this.authService.login(user));
+    } else if ('error' in user) {
+      response.send(user.error);
+    } else {
+      response.status(500).send('Internal Server Error');
+    }
   }
 
   @Post('refresh-token')

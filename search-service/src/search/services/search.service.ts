@@ -1,17 +1,18 @@
+import {
+  AuctionBidPlacedDto,
+  AuctionFinishedDto,
+  AuctionUpdatedDto,
+} from '@bsadriano/rmq-nestjs-lib';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as Relay from 'graphql-relay';
 import { Model } from 'mongoose';
 import { getPagingParameters } from 'nestjs-graphql-relay';
-import { AuctionUpdated } from 'src/queue/dto/auction-updated';
-import { AuctionBidPlaced } from '../dto/auction-bid-placed.dto';
-import { AuctionFinished } from '../dto/auction-finished.dto';
 import { CreateItemInput } from '../dto/item.inputs';
 import { ItemsConnectionArgs } from '../dto/items-connection.args';
 import { BiItemsConnection } from '../dto/items.dto';
 import { Item } from '../item.model';
 import { AuctionSvcHttpClientService } from './auction-svc-http-client.service';
-import { clear } from 'console';
 
 @Injectable()
 export class SearchService {
@@ -162,7 +163,7 @@ export class SearchService {
     };
   }
 
-  async update(data: AuctionUpdated) {
+  async update(data: AuctionUpdatedDto) {
     return await this.itemModel.findOneAndUpdate({ id: data.id }, data, {
       new: true,
     });
@@ -172,7 +173,12 @@ export class SearchService {
     return await this.itemModel.findOneAndDelete({ id });
   }
 
-  async finishAuction({ id, itemSold, soldAmount, winner }: AuctionFinished) {
+  async finishAuction({
+    id,
+    itemSold,
+    soldAmount,
+    winner,
+  }: AuctionFinishedDto) {
     const auction = await this.itemModel.findById({
       id,
     });
@@ -188,7 +194,7 @@ export class SearchService {
     await this.itemModel.updateOne({ id }, update);
   }
 
-  async placeBid({ id, amount, bidStatus, currentHighBid }: AuctionBidPlaced) {
+  async placeBid({ id, amount, bidStatus }: AuctionBidPlacedDto) {
     const auction = await this.itemModel.findById({
       id,
     });

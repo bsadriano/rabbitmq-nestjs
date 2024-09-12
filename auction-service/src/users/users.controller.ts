@@ -1,25 +1,14 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Logger,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { RmqService, Serialize } from '@bsadriano/rmq-nestjs-lib';
+import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
 import {
   Ctx,
   MessagePattern,
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
-import { RmqService } from 'src/rmq/rmq.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UsersService } from './users.service';
-import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from './dto/user.dto';
+import { UsersService } from './users.service';
 
 @Controller()
 export class UsersController {
@@ -99,13 +88,13 @@ export class UsersController {
     return this.usersService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  //   return this.usersService.update(+id, updateUserDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.usersService.remove(+id);
+  // }
 }
