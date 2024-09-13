@@ -8,6 +8,7 @@ import {
   AUCTION_FINISHED_QUEUE,
   USER_QUEUE,
 } from './constants/services';
+import { grpcClientOptions } from './grpc-client.options';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,6 +28,7 @@ async function bootstrap() {
   app.connectMicroservice(rmqService.getOptions(USER_QUEUE));
   app.connectMicroservice(rmqService.getOptions(AUCTION_FINISHED_QUEUE));
   app.connectMicroservice(rmqService.getOptions(AUCTION_BID_PLACED_QUEUE));
+  app.connectMicroservice(grpcClientOptions);
 
   const configService = app.get(ConfigService);
   await app.startAllMicroservices();

@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuctionModule } from './auction/auction.module';
 import configuration from './config/configuration';
 import { UsersModule } from './users/users.module';
+import { GrpcAuctionModule } from './grpc-auction/grpc-auction.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UsersModule } from './users/users.module';
     DatabaseModule.forRoot(),
     AuctionModule,
     UsersModule,
+    GrpcAuctionModule,
   ],
   controllers: [],
   providers: [],
