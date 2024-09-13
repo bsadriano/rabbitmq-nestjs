@@ -11,7 +11,7 @@ import { SearchService } from './services/search.service';
   imports: [
     HttpModule,
     MongooseModule.forFeature([{ name: Item.name, schema: itemSchema }]),
-    AuthModule,
+    AuthModule.register(),
   ],
   providers: [SearchResolver, SearchService, AuctionSvcHttpClientService],
   exports: [SearchService, AuctionSvcHttpClientService],
