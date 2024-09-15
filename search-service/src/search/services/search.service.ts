@@ -3,11 +3,12 @@ import {
   AuctionFinishedDto,
   AuctionUpdatedDto,
 } from '@bsadriano/rmq-nestjs-lib';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as Relay from 'graphql-relay';
 import { Model } from 'mongoose';
 import { getPagingParameters } from 'nestjs-graphql-relay';
+import { BidStatus } from '../bid-status.enum';
 import { CreateItemInput } from '../dto/item.inputs';
 import { ItemsConnectionArgs } from '../dto/items-connection.args';
 import { BiItemsConnection } from '../dto/items.dto';
@@ -16,6 +17,8 @@ import { AuctionSvcHttpClientService } from './auction-svc-http-client.service';
 
 @Injectable()
 export class SearchService {
+  private logger = new Logger(SearchService.name);
+
   constructor(
     @InjectModel(Item.name) private itemModel: Model<Item>,
     private readonly auctionSvcHttpClientService: AuctionSvcHttpClientService,
@@ -198,17 +201,20 @@ export class SearchService {
     const auction = await this.itemModel.findById({
       id,
     });
+
     if (!auction) {
       throw new NotFoundException(`Auction with id #${id} not found`);
     }
+
     const update: any = {};
     if (
       auction.currentHighBid == null ||
-      (bidStatus.includes('Accepted') && amount > auction.currentHighBid)
+      (bidStatus === BidStatus.ACCEPTED && amount > auction.currentHighBid)
     ) {
+      this.logger.verbose('Updating high bid');
       update.currentHighBid = amount;
     }
-    update.status = 'Finished';
+
     await this.itemModel.updateOne({ id }, update);
   }
 }

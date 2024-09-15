@@ -11,7 +11,7 @@ export class Bid extends Document {
   bidder: string;
 
   @Prop()
-  reservePrice: number;
+  amount: number;
 
   @Prop({ type: Date, default: Date.now })
   bidTime: Date;

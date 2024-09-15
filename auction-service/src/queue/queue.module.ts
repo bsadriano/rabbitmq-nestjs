@@ -1,13 +1,54 @@
-import { RmqModule } from '@bsadriano/rmq-nestjs-lib';
 import { Module } from '@nestjs/common';
-import { AUCTION_QUEUE, AUCTION_SERVICE } from 'src/constants/services';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Auction } from 'src/auction/entities/auction.entity';
+import { Item } from 'src/auction/entities/item.entity';
+import {
+  AUCTION_BID_PLACED_EXCHANGE_NAME,
+  AUCTION_CREATED_EXCHANGE_NAME,
+  AUCTION_DELETED_EXCHANGE_NAME,
+  AUCTION_FINISHED_EXCHANGE_NAME,
+  AUCTION_UPDATED_EXCHANGE_NAME,
+} from 'src/constants/services';
+import { RmqModule } from 'src/rmq/rmq.module';
+import { User } from 'src/users/entities/user.entity';
+import { ConsumersSevice } from './services/consumers.service';
 import { ProducerService } from './services/producer.service';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
-    RmqModule.register({ name: AUCTION_SERVICE, queue: AUCTION_QUEUE }),
+    TypeOrmModule.forFeature([Auction, Item, User]),
+    RmqModule.register({
+      exchanges: [
+        {
+          name: AUCTION_CREATED_EXCHANGE_NAME,
+          type: 'fanout',
+        },
+        {
+          name: AUCTION_UPDATED_EXCHANGE_NAME,
+          type: 'fanout',
+        },
+        {
+          name: AUCTION_DELETED_EXCHANGE_NAME,
+          type: 'fanout',
+        },
+        {
+          name: AUCTION_BID_PLACED_EXCHANGE_NAME,
+          type: 'fanout',
+        },
+        {
+          name: AUCTION_FINISHED_EXCHANGE_NAME,
+          type: 'fanout',
+        },
+        {
+          name: 'user-exchange',
+          type: 'topic',
+        },
+      ],
+    }),
+    UsersModule,
   ],
-  providers: [ProducerService],
+  providers: [ProducerService, ConsumersSevice],
   exports: [ProducerService],
 })
 export class QueueModule {}

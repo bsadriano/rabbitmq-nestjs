@@ -23,7 +23,8 @@
   },
   "dependencies": {
     "@bsadriano/rmq-nestjs-lib": "^0.1.3",
-    "@golevelup/nestjs-rabbitmq": "^5.4.0",
+    "@golevelup/nestjs-rabbitmq": "^5.4.1",
+    "@grpc/reflection": "^1.0.4",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.3",
     "@nestjs/core": "^10.0.0",

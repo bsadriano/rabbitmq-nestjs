@@ -1,34 +1,30 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
-import { catchError, lastValueFrom, of, timeout } from 'rxjs';
-import { USER_SERVICE } from 'src/constants/services';
+import {
+  USER_EXCHANGE,
+  USER_VALIDATE_ROUTING_KEY,
+} from 'src/constants/services';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(@Inject(USER_SERVICE) private rabbitClient: ClientProxy) {
+  constructor(private readonly amqpConnection: AmqpConnection) {
     super({ usernameField: 'email' });
   }
 
   async validate(email: string, password: string) {
     try {
-      const result = await lastValueFrom(
-        this.rabbitClient
-          .send(
-            { cmd: 'validate-user' },
-            {
-              email,
-              password,
-            },
-          )
-          .pipe(
-            timeout(5000),
-            catchError((error) =>
-              of<any>({ error: 'Error handled: ' + error.message }),
-            ),
-          ),
-      );
+      const result = await this.amqpConnection.request({
+        exchange: USER_EXCHANGE,
+        routingKey: USER_VALIDATE_ROUTING_KEY,
+        payload: {
+          message: {
+            email,
+            password,
+          },
+        },
+      });
 
       if (result) {
         return result;

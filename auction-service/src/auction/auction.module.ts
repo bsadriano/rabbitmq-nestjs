@@ -1,5 +1,4 @@
-// import { AuthModule, RmqModule } from '@bsadriano/rabbitmq-nestjs-lib';
-import { AuthModule, RmqModule } from '@bsadriano/rmq-nestjs-lib';
+import { AuthModule } from '@bsadriano/rmq-nestjs-lib';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { QueueModule } from 'src/queue/queue.module';
@@ -12,7 +11,6 @@ import { Item } from './entities/item.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Auction, Item, User]),
-    RmqModule,
     AuthModule.register(),
     QueueModule,
   ],

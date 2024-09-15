@@ -1,25 +1,41 @@
+// import { Injectable } from '@nestjs/common';
+// import { UpdateAuctionDto } from 'src/auction/dto/update-auction.dto';
+// import { Auction } from 'src/auction/entities/auction.entity';
+
 import {
   AuctionCreatedDto,
-  AuctionDeletedDto,
   AuctionUpdatedDto,
 } from '@bsadriano/rmq-nestjs-lib';
-import { Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
+import { Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { UpdateAuctionDto } from 'src/auction/dto/update-auction.dto';
 import { Auction } from 'src/auction/entities/auction.entity';
-import { AUCTION_SERVICE } from 'src/constants/services';
+import {
+  AUCTION_CREATED_EXCHANGE_NAME,
+  AUCTION_CREATED_ROUTING_KEY,
+  AUCTION_DELETED_EXCHANGE_NAME,
+  AUCTION_DELETED_ROUTING_KEY,
+  AUCTION_UPDATED_EXCHANGE_NAME,
+  AUCTION_UPDATED_ROUTING_KEY,
+} from 'src/constants/services';
 
 @Injectable()
 export class ProducerService {
-  constructor(@Inject(AUCTION_SERVICE) private rabbitClient: ClientProxy) {}
+  constructor(private readonly amqpConnection: AmqpConnection) {}
 
   createAuction(auction: Auction) {
     const auctionCreated = plainToInstance(AuctionCreatedDto, auction, {
       excludeExtraneousValues: true,
     });
 
-    this.rabbitClient.emit('auction-created', auctionCreated);
+    this.amqpConnection.publish(
+      AUCTION_CREATED_EXCHANGE_NAME,
+      AUCTION_CREATED_ROUTING_KEY,
+      {
+        message: auctionCreated,
+      },
+    );
   }
 
   updateAuction(id: number, updateAuctionDto: UpdateAuctionDto) {
@@ -28,10 +44,22 @@ export class ProducerService {
       ...updateAuctionDto,
     } as AuctionUpdatedDto;
 
-    this.rabbitClient.emit('auction-updated', auctionUpdated);
+    this.amqpConnection.publish(
+      AUCTION_UPDATED_EXCHANGE_NAME,
+      AUCTION_UPDATED_ROUTING_KEY,
+      {
+        message: auctionUpdated,
+      },
+    );
   }
 
   deleteAuction(id: number) {
-    this.rabbitClient.emit(`auction-deleted`, { id } as AuctionDeletedDto);
+    this.amqpConnection.publish(
+      AUCTION_DELETED_EXCHANGE_NAME,
+      AUCTION_DELETED_ROUTING_KEY,
+      {
+        message: { id },
+      },
+    );
   }
 }

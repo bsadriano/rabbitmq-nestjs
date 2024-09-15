@@ -1,7 +1,3 @@
-import {
-  AuctionBidPlacedDto,
-  AuctionFinishedDto,
-} from '@bsadriano/rmq-nestjs-lib';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProducerService } from 'src/queue/services/producer.service';
@@ -145,41 +141,5 @@ export class AuctionService {
     await this.itemRepository.delete({
       id: Not(IsNull()),
     });
-  }
-
-  async finishAuction({
-    id,
-    itemSold,
-    soldAmount,
-    winner,
-  }: AuctionFinishedDto) {
-    const auction = await this.auctionRepository.findOneByOrFail({
-      id,
-    });
-
-    if (itemSold) {
-      auction.winner = winner;
-      auction.soldAmount = soldAmount;
-    }
-
-    auction.status =
-      auction.soldAmount > auction.reservePrice
-        ? AuctionStatus.FINISHED
-        : AuctionStatus.RESERVE_NOT_MET;
-
-    return this.auctionRepository.save(auction);
-  }
-
-  async placeBid({ id, amount, bidStatus }: AuctionBidPlacedDto) {
-    const auction = await this.auctionRepository.findOneByOrFail({ id });
-
-    if (
-      auction.currentHighBid == null ||
-      (bidStatus.includes('Accepted') && amount > auction.currentHighBid)
-    ) {
-      auction.currentHighBid = amount;
-    }
-
-    return this.auctionRepository.save(auction);
   }
 }

@@ -1,4 +1,4 @@
-import { RmqService, Serialize } from '@bsadriano/rmq-nestjs-lib';
+import { JwtAuthGuard, RmqService, Serialize } from '@bsadriano/rmq-nestjs-lib';
 import {
   Body,
   Controller,
@@ -9,7 +9,6 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Ctx, MessagePattern, RmqContext } from '@nestjs/microservices';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -17,7 +16,6 @@ import { CurrentUser } from './current-user.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
-import JwtAuthGuard from './guards/jwt-auth.guard';
 import LocalAuthGuard from './guards/local-auth.guard';
 
 @Controller('api/auth')
@@ -27,7 +25,6 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly rmqService: RmqService,
-    private readonly jwtService: JwtService,
   ) {}
 
   @UseGuards(LocalAuthGuard)
@@ -37,12 +34,12 @@ export class AuthController {
     @CurrentUser() user: User | { error: string },
     @Res({ passthrough: true }) response: Response,
   ) {
-    if (user instanceof User) {
-      response.send(this.authService.login(user));
-    } else if ('error' in user) {
+    if ('error' in user) {
       response.send(user.error);
-    } else {
+    } else if (!user) {
       response.status(500).send('Internal Server Error');
+    } else {
+      response.send(this.authService.login(user));
     }
   }
 

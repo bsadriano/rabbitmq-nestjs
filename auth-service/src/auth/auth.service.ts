@@ -1,10 +1,15 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { ClientProxy } from '@nestjs/microservices';
 import { Response } from 'express';
-import { catchError, of, tap, timeout } from 'rxjs';
-import { USER_SERVICE } from 'src/constants/services';
+import {
+  USER_CREATE_ROUTING_KEY,
+  USER_EXCHANGE,
+  USER_GET_USER_BY_ID_ROUTING_KEY,
+  USER_GET_USERS_ROUTING_KEY,
+  USER_VALIDATE_ROUTING_KEY,
+} from 'src/constants/services';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 
@@ -17,7 +22,7 @@ export class AuthService {
   constructor(
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
-    @Inject(USER_SERVICE) private rabbitClient: ClientProxy,
+    private readonly amqpConnection: AmqpConnection,
   ) {}
 
   login(user: User) {
@@ -64,44 +69,46 @@ export class AuthService {
   }
 
   createUser(createUserDto: CreateUserDto) {
-    return this.rabbitClient
-      .send(
-        {
-          cmd: 'create-user',
-        },
-        createUserDto,
-      )
-      .pipe(
-        timeout(5000),
-        tap((res) => {
-          if (res.error) {
-            if (res.error.statusCode === 400) {
-              throw new BadRequestException(res.error.message);
-            }
-          }
-        }),
-      );
-  }
-
-  getUsers() {
-    return this.rabbitClient.send({ cmd: 'get-users' }, {}).pipe(
-      timeout(5000),
-      catchError((error) => of('Error handled: ' + error.message)),
-    );
-  }
-
-  getUser(id: number) {
-    return this.rabbitClient.send({ cmd: 'get-user-by-id' }, { id });
+    return this.amqpConnection.request({
+      exchange: USER_EXCHANGE,
+      routingKey: USER_CREATE_ROUTING_KEY,
+      payload: {
+        message: createUserDto,
+      },
+    });
   }
 
   validateUser(email: string, password: string) {
-    return this.rabbitClient.send(
-      { cmd: 'validate-user' },
-      {
-        email,
-        password,
+    return this.amqpConnection.request({
+      exchange: USER_EXCHANGE,
+      routingKey: USER_VALIDATE_ROUTING_KEY,
+      payload: {
+        message: {
+          email,
+          password,
+        },
       },
-    );
+    });
+  }
+
+  getUsers() {
+    return this.amqpConnection.request({
+      exchange: USER_EXCHANGE,
+      routingKey: USER_GET_USERS_ROUTING_KEY,
+      payload: {},
+    });
+  }
+
+  getUser(id: number) {
+    return this.amqpConnection.request({
+      exchange: USER_EXCHANGE,
+      routingKey: USER_GET_USER_BY_ID_ROUTING_KEY,
+      payload: {
+        message: {
+          id,
+        },
+      },
+    });
   }
 
   refresh(token: string) {

@@ -11,6 +11,7 @@ export class GrpcAuctionService {
   constructor(
     @InjectRepository(Auction) private auctionRepository: Repository<Auction>,
   ) {}
+
   async getAuction({ id }: GetAuctionRequest): Promise<GrpcAuctionResponse> {
     const auction = await this.auctionRepository.findOne({
       relations: ['seller'],

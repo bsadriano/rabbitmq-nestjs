@@ -1,16 +1,23 @@
-import { RmqModule } from '@bsadriano/rmq-nestjs-lib';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Bid, bidSchema } from 'src/schemas/bid.schema';
-import { QueueController } from './queue.controller';
+import { AUCTION_CREATED_EXCHANGE_NAME } from 'src/constants/services';
+import { Auction, auctionSchema } from 'src/schemas/auction.schema';
+import { RmqModule } from '../rmq/rmq.module';
 import { QueueService } from './queue.service';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Bid.name, schema: bidSchema }]),
-    RmqModule,
+    MongooseModule.forFeature([{ name: Auction.name, schema: auctionSchema }]),
+    RmqModule.register({
+      exchanges: [
+        {
+          name: AUCTION_CREATED_EXCHANGE_NAME,
+          type: 'fanout',
+        },
+      ],
+    }),
   ],
-  controllers: [QueueController],
+  controllers: [],
   providers: [QueueService],
 })
 export class QueueModule {}

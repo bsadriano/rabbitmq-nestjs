@@ -1,11 +1,11 @@
-import { Controller, Logger } from '@nestjs/common';
+import { Controller, Logger, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
-  GetAuctionRequest,
   GrpcAuctionController as GrpcAuctionControllerInterface,
   GrpcAuctionControllerMethods,
   GrpcAuctionResponse,
 } from 'proto/auction';
 import { Observable } from 'rxjs';
+import { GetAuctionRequestDto } from './dto/get-auction-request.dto';
 import { GrpcAuctionService } from './grpc-auction.service';
 
 @Controller()
@@ -14,12 +14,15 @@ export class GrpcAuctionController implements GrpcAuctionControllerInterface {
   private logger = new Logger('GrpcAuctionController');
 
   constructor(private readonly grpcAuctionService: GrpcAuctionService) {}
+
+  @UsePipes(new ValidationPipe({ transform: true }))
   getAuction(
-    request: GetAuctionRequest,
+    request: GetAuctionRequestDto,
   ):
     | Promise<GrpcAuctionResponse>
     | Observable<GrpcAuctionResponse>
     | GrpcAuctionResponse {
+    console.log({ request });
     this.logger.log(`Received Grpc Request for auction with id #${request.id}`);
 
     return this.grpcAuctionService.getAuction(request);

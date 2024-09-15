@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RmqModule } from '@bsadriano/rmq-nestjs-lib';
 import { User } from './entities/user.entity';
-import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), RmqModule],
-  controllers: [UsersController],
+  imports: [TypeOrmModule.forFeature([User])],
   providers: [UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {}

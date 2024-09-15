@@ -16,13 +16,8 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { User } from 'src/users/entities/user.entity';
 import { AuctionService } from './auction.service';
-import {
-  AuctionBidPlacedDto,
-  AuctionFinishedDto,
-} from '@bsadriano/rmq-nestjs-lib';
 import { AuctionDto } from './dto/auction.dto';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
@@ -81,29 +76,5 @@ export class AuctionController {
   @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string) {
     return this.auctionService.remove(+id);
-  }
-
-  @EventPattern('auction-finished')
-  async handleAuctionFinished(
-    @Payload() auctionFinished: AuctionFinishedDto,
-    @Ctx() context: RmqContext,
-  ) {
-    this.logger.verbose('Consuming auction finished');
-
-    await this.auctionService.finishAuction(auctionFinished);
-
-    this.rmqService.ack(context);
-  }
-
-  @EventPattern('auction-bid-placed')
-  async handleBidPlaced(
-    @Payload() auctionBidPlaced: AuctionBidPlacedDto,
-    @Ctx() context: RmqContext,
-  ) {
-    this.logger.verbose('Consuming bid placed');
-
-    await this.auctionService.placeBid(auctionBidPlaced);
-
-    this.rmqService.ack(context);
   }
 }

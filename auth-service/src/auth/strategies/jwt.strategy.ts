@@ -1,17 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ClientProxy } from '@nestjs/microservices';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { catchError, lastValueFrom, of, timeout } from 'rxjs';
-import { USER_SERVICE } from 'src/constants/services';
+import {
+  USER_EXCHANGE,
+  USER_GET_USER_BY_ID_ROUTING_KEY,
+} from 'src/constants/services';
 import { TokenPayload } from '../auth.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     configService: ConfigService,
-    @Inject(USER_SERVICE) private rabbitClient: ClientProxy,
+    private readonly amqpConnection: AmqpConnection,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -23,19 +25,26 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate({ userId }: TokenPayload) {
     try {
-      const result = await lastValueFrom(
-        this.rabbitClient
-          .send(
-            { cmd: 'get-user-by-id' },
-            {
-              userId,
+      console.log(
+        `Sending request to auction: ${JSON.stringify({
+          exchange: USER_EXCHANGE,
+          routingKey: USER_GET_USER_BY_ID_ROUTING_KEY,
+          payload: {
+            message: {
+              id: userId,
             },
-          )
-          .pipe(
-            timeout(5000),
-            catchError((error) => of('Error handled: ' + error.message)),
-          ),
+          },
+        })}`,
       );
+      const result = await this.amqpConnection.request({
+        exchange: USER_EXCHANGE,
+        routingKey: USER_GET_USER_BY_ID_ROUTING_KEY,
+        payload: {
+          message: {
+            id: userId,
+          },
+        },
+      });
 
       if (result) {
         return result;
