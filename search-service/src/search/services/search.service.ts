@@ -182,9 +182,10 @@ export class SearchService {
     soldAmount,
     winner,
   }: AuctionFinishedDto) {
-    const auction = await this.itemModel.findById({
+    const auction = await this.itemModel.findOne({
       id,
     });
+
     if (!auction) {
       throw new NotFoundException(`Auction with id #${id} not found`);
     }
@@ -198,7 +199,7 @@ export class SearchService {
   }
 
   async placeBid({ id, amount, bidStatus }: AuctionBidPlacedDto) {
-    const auction = await this.itemModel.findById({
+    const auction = await this.itemModel.findOne({
       id,
     });
 

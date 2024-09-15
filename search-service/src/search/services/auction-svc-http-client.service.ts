@@ -18,18 +18,18 @@ export class AuctionSvcHttpClientService {
   ) {}
 
   async getItemsForSearchDb(): Promise<AuctionResponseDto[]> {
-    var lastUpdated = await this.itemModel
+    const lastUpdated = await this.itemModel
       .findOne({})
       .select('updatedAt')
       .sort('-updatedAt');
 
-    var auctionURL = this.configService.get<string>('auction_service.url');
+    const auctionURL = this.configService.get<string>('auction_service.url');
 
     if (!auctionURL) {
       throw new Error('Argument cannot be null');
     }
 
-    var url = auctionURL + '/api/auctions/seed';
+    let url = auctionURL + '/api/auctions/seed';
 
     if (lastUpdated !== null && lastUpdated.updatedAt) {
       url += `?date=${format(lastUpdated.updatedAt, 'yyyy-MM-dd HH:mm:ss')}`;
@@ -38,6 +38,7 @@ export class AuctionSvcHttpClientService {
     const { data } = await firstValueFrom(
       this.httpService.get(url).pipe(
         catchError((error: AxiosError) => {
+          console.log(error.message);
           throw 'An error happened!';
         }),
       ),

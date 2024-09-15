@@ -1,7 +1,3 @@
-// import { Injectable } from '@nestjs/common';
-// import { UpdateAuctionDto } from 'src/auction/dto/update-auction.dto';
-// import { Auction } from 'src/auction/entities/auction.entity';
-
 import {
   AuctionCreatedDto,
   AuctionUpdatedDto,

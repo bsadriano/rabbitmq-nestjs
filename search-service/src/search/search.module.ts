@@ -1,3 +1,4 @@
+import { AUTH_EXCHANGE, RmqModule } from '@bsadriano/rmq-nestjs-lib';
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -10,6 +11,14 @@ import { SearchService } from './services/search.service';
   imports: [
     HttpModule,
     MongooseModule.forFeature([{ name: Item.name, schema: itemSchema }]),
+    RmqModule.register({
+      exchanges: [
+        {
+          name: AUTH_EXCHANGE,
+          type: 'topic',
+        },
+      ],
+    }),
   ],
   providers: [SearchResolver, SearchService, AuctionSvcHttpClientService],
   exports: [SearchService, AuctionSvcHttpClientService],

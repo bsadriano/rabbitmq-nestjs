@@ -22,7 +22,7 @@
     "seed:refresh": "ts-node -r tsconfig-paths/register ./src/auction/seeders/auction.seeder.ts --refresh"
   },
   "dependencies": {
-    "@bsadriano/rmq-nestjs-lib": "^0.1.3",
+    "@bsadriano/rmq-nestjs-lib": "^0.2.0",
     "@golevelup/nestjs-rabbitmq": "^5.4.1",
     "@grpc/reflection": "^1.0.4",
     "@nestjs/common": "^10.0.0",

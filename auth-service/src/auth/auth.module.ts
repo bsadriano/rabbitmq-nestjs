@@ -3,7 +3,6 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { USER_EXCHANGE } from 'src/constants/services';
-import { RmqModule as MyRmqModule } from '../rmq/rmq.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
@@ -20,8 +19,7 @@ import { LocalStrategy } from './strategies/local.strategy';
       }),
       inject: [ConfigService],
     }),
-    RmqModule,
-    MyRmqModule.register({
+    RmqModule.register({
       exchanges: [
         {
           name: USER_EXCHANGE,

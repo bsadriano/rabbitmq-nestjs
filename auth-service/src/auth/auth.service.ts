@@ -1,3 +1,4 @@
+import { CurrentUser, RMQMessage } from '@bsadriano/rmq-nestjs-lib';
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import { Injectable, Logger, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -13,8 +14,6 @@ import {
   USER_GET_USERS_ROUTING_KEY,
   USER_VALIDATE_ROUTING_KEY,
 } from 'src/constants/services';
-import { MQMessage } from 'src/rmq/mq-message';
-import { CurrentUser } from './current-user.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import JwtAuthGuard from './guards/jwt-auth.guard';
@@ -86,7 +85,7 @@ export class AuthService {
     });
   }
 
-  @MQMessage({
+  @RMQMessage({
     exchange: AUTH_EXCHANGE,
     service: AUTH_SERVICE,
     cmd: AUTH_CMD_VALIDATE_USER,

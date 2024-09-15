@@ -2,6 +2,7 @@ import {
   AuctionBidPlacedDto,
   AuctionFinishedDto,
   AuctionStatus,
+  RMQMessage,
   Serialize,
 } from '@bsadriano/rmq-nestjs-lib';
 import {
@@ -22,7 +23,6 @@ import {
   USER_EXCHANGE,
   USER_SERVICE,
 } from 'src/constants/services';
-import { MQMessage } from 'src/rmq/mq-message';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UserDto } from 'src/users/dto/user.dto';
 import { UsersService } from 'src/users/users.service';
@@ -95,7 +95,7 @@ export class ConsumersSevice {
     this.auctionRepository.save(auction);
   }
 
-  @MQMessage({
+  @RMQMessage({
     exchange: USER_EXCHANGE,
     service: USER_SERVICE,
     cmd: USER_CMD_CREATE,
@@ -110,7 +110,7 @@ export class ConsumersSevice {
     return this.usersService.create(message);
   }
 
-  @MQMessage({
+  @RMQMessage({
     exchange: USER_EXCHANGE,
     service: USER_SERVICE,
     cmd: USER_CMD_VALIDATE,
@@ -129,7 +129,7 @@ export class ConsumersSevice {
     return this.usersService.validateUser(message);
   }
 
-  @MQMessage({
+  @RMQMessage({
     exchange: USER_EXCHANGE,
     service: USER_SERVICE,
     cmd: USER_CMD_GET_USERS,
@@ -141,7 +141,7 @@ export class ConsumersSevice {
     return this.usersService.findAll();
   }
 
-  @MQMessage({
+  @RMQMessage({
     exchange: USER_EXCHANGE,
     service: USER_SERVICE,
     cmd: USER_CMD_GET_USER_BY_ID,

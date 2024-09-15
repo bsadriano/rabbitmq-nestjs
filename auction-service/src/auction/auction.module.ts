@@ -1,7 +1,7 @@
+import { RmqModule } from '@bsadriano/rmq-nestjs-lib';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { QueueModule } from 'src/queue/queue.module';
-import { RmqModule } from 'src/rmq/rmq.module';
 import { User } from 'src/users/entities/user.entity';
 import { AuctionController } from './auction.controller';
 import { AuctionService } from './auction.service';

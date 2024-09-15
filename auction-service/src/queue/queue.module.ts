@@ -1,3 +1,4 @@
+import { RmqModule } from '@bsadriano/rmq-nestjs-lib';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Auction } from 'src/auction/entities/auction.entity';
@@ -9,11 +10,10 @@ import {
   AUCTION_FINISHED_EXCHANGE_NAME,
   AUCTION_UPDATED_EXCHANGE_NAME,
 } from 'src/constants/services';
-import { RmqModule } from 'src/rmq/rmq.module';
 import { User } from 'src/users/entities/user.entity';
+import { UsersModule } from 'src/users/users.module';
 import { ConsumersSevice } from './services/consumers.service';
 import { ProducerService } from './services/producer.service';
-import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [

@@ -1,6 +1,6 @@
+import { JwtAuthGuard } from '@bsadriano/rmq-nestjs-lib';
 import { UseGuards } from '@nestjs/common';
 import { Args, Query, Resolver } from '@nestjs/graphql';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ItemsConnectionArgs } from './dto/items-connection.args';
 import { BiItemsConnection, ItemsConnection } from './dto/items.dto';
 import { Item } from './item.model';

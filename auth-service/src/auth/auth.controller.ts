@@ -1,4 +1,4 @@
-import { Serialize } from '@bsadriano/rmq-nestjs-lib';
+import { CurrentUser, Serialize } from '@bsadriano/rmq-nestjs-lib';
 import {
   Body,
   Controller,
@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { CurrentUser } from './current-user.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserDto } from './dto/user.dto';
 import { User } from './entities/user.entity';

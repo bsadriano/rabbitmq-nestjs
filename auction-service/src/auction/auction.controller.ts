@@ -1,4 +1,8 @@
-import { Serialize } from '@bsadriano/rmq-nestjs-lib';
+import {
+  CurrentUser,
+  JwtAuthGuard,
+  Serialize,
+} from '@bsadriano/rmq-nestjs-lib';
 import {
   Body,
   Controller,
@@ -11,12 +15,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { User } from 'src/users/entities/user.entity';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AuctionService } from './auction.service';
 import { AuctionDto } from './dto/auction.dto';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
-import { CurrentUser } from 'src/auth/current-user.decorator';
 
 @Controller('api/auctions')
 export class AuctionController {
