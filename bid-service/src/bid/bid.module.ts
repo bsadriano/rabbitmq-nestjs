@@ -1,4 +1,3 @@
-import { AuthModule } from '@bsadriano/rmq-nestjs-lib';
 import { ReflectionService } from '@grpc/reflection';
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -31,7 +30,6 @@ import { BidService } from './services/bid.service';
       { name: Auction.name, schema: auctionSchema },
       { name: Bid.name, schema: bidSchema },
     ]),
-    AuthModule.register(),
     RmqModule.register({
       exchanges: [
         {

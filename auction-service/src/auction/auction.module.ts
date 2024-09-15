@@ -1,7 +1,7 @@
-import { AuthModule } from '@bsadriano/rmq-nestjs-lib';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { QueueModule } from 'src/queue/queue.module';
+import { RmqModule } from 'src/rmq/rmq.module';
 import { User } from 'src/users/entities/user.entity';
 import { AuctionController } from './auction.controller';
 import { AuctionService } from './auction.service';
@@ -11,8 +11,15 @@ import { Item } from './entities/item.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Auction, Item, User]),
-    AuthModule.register(),
     QueueModule,
+    RmqModule.register({
+      exchanges: [
+        {
+          name: 'user-exchange',
+          type: 'topic',
+        },
+      ],
+    }),
   ],
   controllers: [AuctionController],
   providers: [AuctionService],

@@ -41,6 +41,10 @@ import { UsersModule } from 'src/users/users.module';
           type: 'fanout',
         },
         {
+          name: 'auth-exchange',
+          type: 'topic',
+        },
+        {
           name: 'user-exchange',
           type: 'topic',
         },

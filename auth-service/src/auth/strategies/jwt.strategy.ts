@@ -17,26 +17,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: any) => request?.Authentication,
+        (request: any) => request?.message?.Authentication,
       ]),
+      ignoreExpiration: false,
       secretOrKey: configService.get<string>('JWT_SECRET'),
     });
   }
 
   async validate({ userId }: TokenPayload) {
     try {
-      console.log(
-        `Sending request to auction: ${JSON.stringify({
-          exchange: USER_EXCHANGE,
-          routingKey: USER_GET_USER_BY_ID_ROUTING_KEY,
-          payload: {
-            message: {
-              id: userId,
-            },
-          },
-        })}`,
-      );
-      const result = await this.amqpConnection.request({
+      return await this.amqpConnection.request({
         exchange: USER_EXCHANGE,
         routingKey: USER_GET_USER_BY_ID_ROUTING_KEY,
         payload: {
@@ -45,12 +35,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           },
         },
       });
-
-      if (result) {
-        return result;
-      }
-
-      return null;
     } catch (error) {
       console.error('Validation error:', error.message);
       return null;

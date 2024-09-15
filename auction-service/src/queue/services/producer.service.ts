@@ -62,4 +62,19 @@ export class ProducerService {
       },
     );
   }
+
+  validateUser(authentication: string) {
+    return this.amqpConnection.request({
+      exchange: 'auth-exchange',
+      routingKey: 'auth.cmd.validate-user',
+      payload: {
+        message: {
+          Authentication: authentication,
+        },
+      },
+      headers: {
+        Authentication: authentication,
+      },
+    });
+  }
 }

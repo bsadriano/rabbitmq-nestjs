@@ -27,6 +27,10 @@ import { LocalStrategy } from './strategies/local.strategy';
           name: USER_EXCHANGE,
           type: 'topic',
         },
+        {
+          name: 'auth-exchange',
+          type: 'topic',
+        },
       ],
     }),
   ],
