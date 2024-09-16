@@ -17,3 +17,8 @@ cd ..
 cd "bid-service"
 npm uninstall @bsadriano/rmq-nestjs-lib
 npm install @bsadriano/rmq-nestjs-lib
+
+cd ..
+cd "notification-service"
+npm uninstall @bsadriano/rmq-nestjs-lib
+npm install @bsadriano/rmq-nestjs-lib
