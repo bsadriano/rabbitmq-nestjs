@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AUCTION_CREATED_EXCHANGE_NAME } from 'src/constants/services';
+import { AUCTION_CREATED_EXCHANGE } from 'src/constants/services';
 import { Auction, auctionSchema } from 'src/schemas/auction.schema';
 import { RmqModule } from '../rmq/rmq.module';
 import { QueueService } from './queue.service';
@@ -11,7 +11,7 @@ import { QueueService } from './queue.service';
     RmqModule.register({
       exchanges: [
         {
-          name: AUCTION_CREATED_EXCHANGE_NAME,
+          name: AUCTION_CREATED_EXCHANGE,
           type: 'fanout',
         },
       ],

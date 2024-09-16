@@ -3,7 +3,7 @@ import { IsDateString, IsInt, IsString, Max, Min } from 'class-validator';
 
 @InputType()
 export class CreateItemInput {
-  @Field((type) => Int)
+  @Field(() => Int)
   @IsInt()
   @Min(0)
   reservePrice: number;
@@ -16,7 +16,7 @@ export class CreateItemInput {
   @IsString()
   make: string;
 
-  @Field((type) => Int)
+  @Field(() => Int)
   @Min(1930)
   @Max(2050)
   year: number;
@@ -29,7 +29,7 @@ export class CreateItemInput {
   @IsString()
   color: string;
 
-  @Field((type) => Int)
+  @Field(() => Int)
   @Min(0)
   @Max(1000000)
   mileage: number;

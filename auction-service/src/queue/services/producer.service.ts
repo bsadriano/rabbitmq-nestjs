@@ -8,11 +8,11 @@ import { plainToInstance } from 'class-transformer';
 import { UpdateAuctionDto } from 'src/auction/dto/update-auction.dto';
 import { Auction } from 'src/auction/entities/auction.entity';
 import {
-  AUCTION_CREATED_EXCHANGE_NAME,
+  AUCTION_CREATED_EXCHANGE,
   AUCTION_CREATED_ROUTING_KEY,
-  AUCTION_DELETED_EXCHANGE_NAME,
+  AUCTION_DELETED_EXCHANGE,
   AUCTION_DELETED_ROUTING_KEY,
-  AUCTION_UPDATED_EXCHANGE_NAME,
+  AUCTION_UPDATED_EXCHANGE,
   AUCTION_UPDATED_ROUTING_KEY,
   AUTH_EXCHANGE,
   AUTH_VALIDATE_USER_ROUTING_KEY,
@@ -28,7 +28,7 @@ export class ProducerService {
     });
 
     this.amqpConnection.publish(
-      AUCTION_CREATED_EXCHANGE_NAME,
+      AUCTION_CREATED_EXCHANGE,
       AUCTION_CREATED_ROUTING_KEY,
       {
         message: auctionCreated,
@@ -43,7 +43,7 @@ export class ProducerService {
     } as AuctionUpdatedDto;
 
     this.amqpConnection.publish(
-      AUCTION_UPDATED_EXCHANGE_NAME,
+      AUCTION_UPDATED_EXCHANGE,
       AUCTION_UPDATED_ROUTING_KEY,
       {
         message: auctionUpdated,
@@ -53,7 +53,7 @@ export class ProducerService {
 
   deleteAuction(id: number) {
     this.amqpConnection.publish(
-      AUCTION_DELETED_EXCHANGE_NAME,
+      AUCTION_DELETED_EXCHANGE,
       AUCTION_DELETED_ROUTING_KEY,
       {
         message: { id },
