@@ -11,15 +11,15 @@ import {
 } from '@golevelup/nestjs-rabbitmq';
 import { Injectable, Logger } from '@nestjs/common';
 import {
-  AUCTION_BID_PLACED_EXCHANGE_NAME,
+  AUCTION_BID_PLACED_EXCHANGE,
   AUCTION_BID_PLACED_ROUTING_KEY,
-  AUCTION_CREATED_EXCHANGE_NAME,
+  AUCTION_CREATED_EXCHANGE,
   AUCTION_CREATED_ROUTING_KEY,
-  AUCTION_DELETED_EXCHANGE_NAME,
+  AUCTION_DELETED_EXCHANGE,
   AUCTION_DELETED_ROUTING_KEY,
-  AUCTION_FINISHED_EXCHANGE_NAME,
+  AUCTION_FINISHED_EXCHANGE,
   AUCTION_FINISHED_ROUTING_KEY,
-  AUCTION_UPDATED_EXCHANGE_NAME,
+  AUCTION_UPDATED_EXCHANGE,
   AUCTION_UPDATED_ROUTING_KEY,
 } from 'src/constants/services';
 import { CreateItemInput } from 'src/search/dto/item.inputs';
@@ -32,7 +32,7 @@ export class QueueService {
   constructor(private searchService: SearchService) {}
 
   @RabbitSubscribe({
-    exchange: AUCTION_CREATED_EXCHANGE_NAME,
+    exchange: AUCTION_CREATED_EXCHANGE,
     routingKey: AUCTION_CREATED_ROUTING_KEY,
     errorBehavior: MessageHandlerErrorBehavior.ACK,
   })
@@ -50,7 +50,7 @@ export class QueueService {
   }
 
   @RabbitSubscribe({
-    exchange: AUCTION_UPDATED_EXCHANGE_NAME,
+    exchange: AUCTION_UPDATED_EXCHANGE,
     routingKey: AUCTION_UPDATED_ROUTING_KEY,
     errorBehavior: MessageHandlerErrorBehavior.ACK,
   })
@@ -65,7 +65,7 @@ export class QueueService {
   }
 
   @RabbitSubscribe({
-    exchange: AUCTION_DELETED_EXCHANGE_NAME,
+    exchange: AUCTION_DELETED_EXCHANGE,
     routingKey: AUCTION_DELETED_ROUTING_KEY,
     errorBehavior: MessageHandlerErrorBehavior.ACK,
   })
@@ -82,7 +82,7 @@ export class QueueService {
   }
 
   @RabbitSubscribe({
-    exchange: AUCTION_BID_PLACED_EXCHANGE_NAME,
+    exchange: AUCTION_BID_PLACED_EXCHANGE,
     routingKey: AUCTION_BID_PLACED_ROUTING_KEY,
     errorBehavior: MessageHandlerErrorBehavior.ACK,
   })
@@ -93,7 +93,7 @@ export class QueueService {
   }
 
   @RabbitSubscribe({
-    exchange: AUCTION_FINISHED_EXCHANGE_NAME,
+    exchange: AUCTION_FINISHED_EXCHANGE,
     routingKey: AUCTION_FINISHED_ROUTING_KEY,
     errorBehavior: MessageHandlerErrorBehavior.ACK,
   })

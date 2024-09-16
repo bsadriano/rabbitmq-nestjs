@@ -12,7 +12,7 @@ import { Model } from 'mongoose';
 import { GRPC_AUCTION_SERVICE_NAME, GrpcAuctionClient } from 'proto/auction';
 import { catchError, firstValueFrom, of } from 'rxjs';
 import {
-  AUCTION_BID_PLACED_EXCHANGE_NAME,
+  AUCTION_BID_PLACED_EXCHANGE,
   AUCTION_BID_PLACED_ROUTING_KEY,
 } from 'src/constants/services';
 import { Auction } from 'src/schemas/auction.schema';
@@ -91,7 +91,7 @@ export class BidService {
       createdBid.save();
 
       this.amqpConnection.publish(
-        AUCTION_BID_PLACED_EXCHANGE_NAME,
+        AUCTION_BID_PLACED_EXCHANGE,
         AUCTION_BID_PLACED_ROUTING_KEY,
         {
           message: {

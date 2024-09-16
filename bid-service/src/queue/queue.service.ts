@@ -7,7 +7,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
-  AUCTION_CREATED_EXCHANGE_NAME,
+  AUCTION_CREATED_EXCHANGE,
   AUCTION_CREATED_ROUTING_KEY,
 } from 'src/constants/services';
 import { Auction } from 'src/schemas/auction.schema';
@@ -25,7 +25,7 @@ export class QueueService {
   }
 
   @RabbitSubscribe({
-    exchange: AUCTION_CREATED_EXCHANGE_NAME,
+    exchange: AUCTION_CREATED_EXCHANGE,
     routingKey: AUCTION_CREATED_ROUTING_KEY,
     errorBehavior: MessageHandlerErrorBehavior.ACK,
   })

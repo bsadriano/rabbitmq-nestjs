@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
 import { join } from 'path';
-import { AUCTION_BID_PLACED_EXCHANGE_NAME } from 'src/constants/services';
+import { AUCTION_BID_PLACED_EXCHANGE } from 'src/constants/services';
 import { Auction, auctionSchema } from 'src/schemas/auction.schema';
 import { Bid, bidSchema } from 'src/schemas/bid.schema';
 import { RmqModule } from '../rmq/rmq.module';
@@ -33,7 +33,7 @@ import { BidService } from './services/bid.service';
     RmqModule.register({
       exchanges: [
         {
-          name: AUCTION_BID_PLACED_EXCHANGE_NAME,
+          name: AUCTION_BID_PLACED_EXCHANGE,
           type: 'fanout',
         },
       ],

@@ -12,9 +12,9 @@ import {
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
-  AUCTION_BID_PLACED_EXCHANGE_NAME,
+  AUCTION_BID_PLACED_EXCHANGE,
   AUCTION_BID_PLACED_ROUTING_KEY,
-  AUCTION_FINISHED_EXCHANGE_NAME,
+  AUCTION_FINISHED_EXCHANGE,
   AUCTION_FINISHED_ROUTING_KEY,
   USER_CMD_CREATE,
   USER_CMD_GET_USER_BY_ID,
@@ -40,7 +40,7 @@ export class ConsumersSevice {
   ) {}
 
   @RabbitSubscribe({
-    exchange: AUCTION_BID_PLACED_EXCHANGE_NAME,
+    exchange: AUCTION_BID_PLACED_EXCHANGE,
     routingKey: AUCTION_BID_PLACED_ROUTING_KEY,
     errorBehavior: MessageHandlerErrorBehavior.ACK,
   })
@@ -65,7 +65,7 @@ export class ConsumersSevice {
   }
 
   @RabbitSubscribe({
-    exchange: AUCTION_FINISHED_EXCHANGE_NAME,
+    exchange: AUCTION_FINISHED_EXCHANGE,
     routingKey: AUCTION_FINISHED_ROUTING_KEY,
     errorBehavior: MessageHandlerErrorBehavior.ACK,
   })
