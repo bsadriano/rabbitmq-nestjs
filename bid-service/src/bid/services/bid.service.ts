@@ -41,10 +41,11 @@ export class BidService {
   async placeBid(user: User, { auctionId, amount }: PlaceBidRequestDto) {
     try {
       let auction: any = await this.auctionModel.findOne({ id: auctionId });
-      this.logger.log({ local: auction });
 
       if (auction === null) {
-        auction = await firstValueFrom(
+        this.logger.log('Fetching auction in service');
+
+        const response = await firstValueFrom(
           this.grpcAuctionClient.getAuction({ id: auctionId }).pipe(
             catchError((error) => {
               this.logger.log('Error in grpc: ' + error.message);
@@ -52,6 +53,18 @@ export class BidService {
             }),
           ),
         );
+
+        const { id, auctionEnd, seller, reservePrice, updatedAt } =
+          response.auction;
+        auction = response.auction;
+
+        await this.auctionModel.create({
+          id,
+          auctionEnd,
+          seller,
+          reservePrice,
+          updatedAt,
+        });
       }
 
       if (auction === null) {

@@ -1,4 +1,4 @@
-import { RmqModule } from '@bsadriano/rmq-nestjs-lib';
+import { AUTH_EXCHANGE, RmqModule } from '@bsadriano/rmq-nestjs-lib';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Auction } from 'src/auction/entities/auction.entity';
@@ -9,6 +9,7 @@ import {
   AUCTION_DELETED_EXCHANGE_NAME,
   AUCTION_FINISHED_EXCHANGE_NAME,
   AUCTION_UPDATED_EXCHANGE_NAME,
+  USER_EXCHANGE,
 } from 'src/constants/services';
 import { User } from 'src/users/entities/user.entity';
 import { UsersModule } from 'src/users/users.module';
@@ -41,11 +42,11 @@ import { ProducerService } from './services/producer.service';
           type: 'fanout',
         },
         {
-          name: 'auth-exchange',
+          name: AUTH_EXCHANGE,
           type: 'topic',
         },
         {
-          name: 'user-exchange',
+          name: USER_EXCHANGE,
           type: 'topic',
         },
       ],

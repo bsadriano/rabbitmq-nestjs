@@ -7,6 +7,7 @@ import { AuctionController } from './auction.controller';
 import { AuctionService } from './auction.service';
 import { Auction } from './entities/auction.entity';
 import { Item } from './entities/item.entity';
+import { USER_EXCHANGE } from 'src/constants/services';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { Item } from './entities/item.entity';
     RmqModule.register({
       exchanges: [
         {
-          name: 'user-exchange',
+          name: USER_EXCHANGE,
           type: 'topic',
         },
       ],

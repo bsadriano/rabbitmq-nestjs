@@ -21,11 +21,11 @@ export class AuctionSeeder implements Seeder {
 
     if (auctions.length > 0) {
       await this.auction.insertMany(
-        auctions.map(({ id, reservePrice, seller, createdAt, auctionEnd }) => ({
+        auctions.map(({ id, reservePrice, seller, updatedAt, auctionEnd }) => ({
           id,
           reservePrice,
           seller,
-          createdAt,
+          updatedAt,
           auctionEnd,
         })),
       );

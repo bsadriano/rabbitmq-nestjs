@@ -30,6 +30,7 @@ export class GrpcAuctionService {
         id: auction.id,
         reservePrice: auction.reservePrice,
         seller: getFullName(auction.seller.firstName, auction.seller.lastName),
+        updatedAt: auction.updatedAt,
       },
     } satisfies GrpcAuctionResponse;
   }

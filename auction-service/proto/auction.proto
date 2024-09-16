@@ -15,6 +15,7 @@ message GrpcAuctionModel {
     string seller = 2;
     string auctionEnd = 3;
     int32 reservePrice = 4;
+    string updatedAt = 5;
 }
 
 message GrpcAuctionResponse {

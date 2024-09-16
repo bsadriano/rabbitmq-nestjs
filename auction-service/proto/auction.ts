@@ -19,6 +19,7 @@ export interface GrpcAuctionModel {
   seller: string;
   auctionEnd: string;
   reservePrice: number;
+  updatedAt: string;
 }
 
 export interface GrpcAuctionResponse {

@@ -3,6 +3,7 @@ export class AuctionResponseDto {
   reservePrice: number;
   seller: string;
   createdAt: string;
+  updatedAt: string;
   auctionEnd: string;
   make: string;
   year: number;

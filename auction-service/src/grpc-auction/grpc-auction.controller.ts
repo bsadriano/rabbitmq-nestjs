@@ -22,7 +22,6 @@ export class GrpcAuctionController implements GrpcAuctionControllerInterface {
     | Promise<GrpcAuctionResponse>
     | Observable<GrpcAuctionResponse>
     | GrpcAuctionResponse {
-    console.log({ request });
     this.logger.log(`Received Grpc Request for auction with id #${request.id}`);
 
     return this.grpcAuctionService.getAuction(request);

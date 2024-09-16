@@ -2,7 +2,7 @@ import { RmqModule } from '@bsadriano/rmq-nestjs-lib';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { USER_EXCHANGE } from 'src/constants/services';
+import { AUTH_EXCHANGE, USER_EXCHANGE } from 'src/constants/services';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
@@ -26,7 +26,7 @@ import { LocalStrategy } from './strategies/local.strategy';
           type: 'topic',
         },
         {
-          name: 'auth-exchange',
+          name: AUTH_EXCHANGE,
           type: 'topic',
         },
       ],

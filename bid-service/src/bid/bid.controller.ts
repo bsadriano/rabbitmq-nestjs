@@ -1,6 +1,10 @@
-import { CurrentUser, Serialize, User } from '@bsadriano/rmq-nestjs-lib';
+import {
+  CurrentUser,
+  JwtAuthGuard,
+  Serialize,
+  User,
+} from '@bsadriano/rmq-nestjs-lib';
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { BidDto } from './dto/bid.dto';
 import { PlaceBidRequestDto } from './dto/place-bid-request.dto';
 import { BidService } from './services/bid.service';

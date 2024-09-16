@@ -45,7 +45,7 @@ export class UsersService {
         email: createUserDto.email,
       });
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
     }
 
     if (user) {

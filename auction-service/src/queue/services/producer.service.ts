@@ -14,6 +14,8 @@ import {
   AUCTION_DELETED_ROUTING_KEY,
   AUCTION_UPDATED_EXCHANGE_NAME,
   AUCTION_UPDATED_ROUTING_KEY,
+  AUTH_EXCHANGE,
+  AUTH_VALIDATE_USER_ROUTING_KEY,
 } from 'src/constants/services';
 
 @Injectable()
@@ -61,8 +63,8 @@ export class ProducerService {
 
   validateUser(authentication: string) {
     return this.amqpConnection.request({
-      exchange: 'auth-exchange',
-      routingKey: 'auth.cmd.validate-user',
+      exchange: AUTH_EXCHANGE,
+      routingKey: AUTH_VALIDATE_USER_ROUTING_KEY,
       payload: {
         message: {
           Authentication: authentication,
