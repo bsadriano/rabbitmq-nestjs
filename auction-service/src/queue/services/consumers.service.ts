@@ -5,17 +5,13 @@ import {
   RMQMessage,
   Serialize,
 } from '@bsadriano/rmq-nestjs-lib';
-import {
-  MessageHandlerErrorBehavior,
-  RabbitSubscribe,
-} from '@golevelup/nestjs-rabbitmq';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   AUCTION_BID_PLACED_EXCHANGE,
-  AUCTION_BID_PLACED_ROUTING_KEY,
+  AUCTION_CMD_FINISHED,
   AUCTION_FINISHED_EXCHANGE,
-  AUCTION_FINISHED_ROUTING_KEY,
+  AUCTION_SERVICE,
   USER_CMD_CREATE,
   USER_CMD_GET_USER_BY_ID,
   USER_CMD_GET_USERS,
@@ -39,10 +35,11 @@ export class ConsumersSevice {
     private readonly usersService: UsersService,
   ) {}
 
-  @RabbitSubscribe({
+  @RMQMessage({
     exchange: AUCTION_BID_PLACED_EXCHANGE,
-    routingKey: AUCTION_BID_PLACED_ROUTING_KEY,
-    errorBehavior: MessageHandlerErrorBehavior.ACK,
+    service: 'auction',
+    cmd: 'bid-placed',
+    type: 'sub',
   })
   async handleBidPlaced({
     message: { id, amount, bidStatus },
@@ -64,10 +61,11 @@ export class ConsumersSevice {
     this.auctionRepository.save(auction);
   }
 
-  @RabbitSubscribe({
+  @RMQMessage({
     exchange: AUCTION_FINISHED_EXCHANGE,
-    routingKey: AUCTION_FINISHED_ROUTING_KEY,
-    errorBehavior: MessageHandlerErrorBehavior.ACK,
+    service: AUCTION_SERVICE,
+    cmd: AUCTION_CMD_FINISHED,
+    type: 'sub',
   })
   async handleFinishAuction({
     message: { id, itemSold, soldAmount, winner },

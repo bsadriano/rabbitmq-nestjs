@@ -1,14 +1,11 @@
-import { AuctionCreatedDto } from '@bsadriano/rmq-nestjs-lib';
-import {
-  MessageHandlerErrorBehavior,
-  RabbitSubscribe,
-} from '@golevelup/nestjs-rabbitmq';
+import { AuctionCreatedDto, RMQMessage } from '@bsadriano/rmq-nestjs-lib';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
+  AUCTION_CMD_CREATED,
   AUCTION_CREATED_EXCHANGE,
-  AUCTION_CREATED_ROUTING_KEY,
+  AUCTION_SERVICE,
 } from 'src/constants/services';
 import { Auction } from 'src/schemas/auction.schema';
 
@@ -24,10 +21,11 @@ export class QueueService {
     return await this.auctionModel.create(payload);
   }
 
-  @RabbitSubscribe({
+  @RMQMessage({
     exchange: AUCTION_CREATED_EXCHANGE,
-    routingKey: AUCTION_CREATED_ROUTING_KEY,
-    errorBehavior: MessageHandlerErrorBehavior.ACK,
+    service: AUCTION_SERVICE,
+    cmd: AUCTION_CMD_CREATED,
+    type: 'sub',
   })
   async handleAuctionCreated({ message }: { message: AuctionCreatedDto }) {
     this.logger.verbose(

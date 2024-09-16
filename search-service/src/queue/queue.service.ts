@@ -4,23 +4,21 @@ import {
   AuctionDeletedDto,
   AuctionFinishedDto,
   AuctionUpdatedDto,
+  RMQMessage,
 } from '@bsadriano/rmq-nestjs-lib';
-import {
-  MessageHandlerErrorBehavior,
-  RabbitSubscribe,
-} from '@golevelup/nestjs-rabbitmq';
 import { Injectable, Logger } from '@nestjs/common';
 import {
   AUCTION_BID_PLACED_EXCHANGE,
-  AUCTION_BID_PLACED_ROUTING_KEY,
+  AUCTION_CMD_BID_PLACED,
+  AUCTION_CMD_CREATED,
+  AUCTION_CMD_DELETED,
+  AUCTION_CMD_FINISHED,
+  AUCTION_CMD_UPDATED,
   AUCTION_CREATED_EXCHANGE,
-  AUCTION_CREATED_ROUTING_KEY,
   AUCTION_DELETED_EXCHANGE,
-  AUCTION_DELETED_ROUTING_KEY,
   AUCTION_FINISHED_EXCHANGE,
-  AUCTION_FINISHED_ROUTING_KEY,
+  AUCTION_SERVICE,
   AUCTION_UPDATED_EXCHANGE,
-  AUCTION_UPDATED_ROUTING_KEY,
 } from 'src/constants/services';
 import { CreateItemInput } from 'src/search/dto/item.inputs';
 import { SearchService } from 'src/search/services/search.service';
@@ -31,10 +29,11 @@ export class QueueService {
 
   constructor(private searchService: SearchService) {}
 
-  @RabbitSubscribe({
+  @RMQMessage({
     exchange: AUCTION_CREATED_EXCHANGE,
-    routingKey: AUCTION_CREATED_ROUTING_KEY,
-    errorBehavior: MessageHandlerErrorBehavior.ACK,
+    service: AUCTION_SERVICE,
+    cmd: AUCTION_CMD_CREATED,
+    type: 'sub',
   })
   async handleAuctionCreated({ message }: { message: AuctionCreatedDto }) {
     this.logger.verbose(
@@ -49,10 +48,11 @@ export class QueueService {
     this.logger.verbose('Successfully added auction ');
   }
 
-  @RabbitSubscribe({
+  @RMQMessage({
     exchange: AUCTION_UPDATED_EXCHANGE,
-    routingKey: AUCTION_UPDATED_ROUTING_KEY,
-    errorBehavior: MessageHandlerErrorBehavior.ACK,
+    service: AUCTION_SERVICE,
+    cmd: AUCTION_CMD_UPDATED,
+    type: 'sub',
   })
   async handleAuctionUpdated({ message }: { message: AuctionUpdatedDto }) {
     this.logger.verbose(
@@ -64,10 +64,11 @@ export class QueueService {
     this.logger.verbose('Successfully updated auction');
   }
 
-  @RabbitSubscribe({
+  @RMQMessage({
     exchange: AUCTION_DELETED_EXCHANGE,
-    routingKey: AUCTION_DELETED_ROUTING_KEY,
-    errorBehavior: MessageHandlerErrorBehavior.ACK,
+    service: AUCTION_SERVICE,
+    cmd: AUCTION_CMD_DELETED,
+    type: 'sub',
   })
   async handleAuctionDeleted({
     message: { id },
@@ -81,10 +82,11 @@ export class QueueService {
     this.logger.verbose('Successfully deleted auction');
   }
 
-  @RabbitSubscribe({
+  @RMQMessage({
     exchange: AUCTION_BID_PLACED_EXCHANGE,
-    routingKey: AUCTION_BID_PLACED_ROUTING_KEY,
-    errorBehavior: MessageHandlerErrorBehavior.ACK,
+    service: AUCTION_SERVICE,
+    cmd: AUCTION_CMD_BID_PLACED,
+    type: 'sub',
   })
   async handleBidPlaced({ message }: { message: AuctionBidPlacedDto }) {
     this.logger.verbose('Consuming bid placed');
@@ -92,10 +94,11 @@ export class QueueService {
     await this.searchService.placeBid(message);
   }
 
-  @RabbitSubscribe({
+  @RMQMessage({
     exchange: AUCTION_FINISHED_EXCHANGE,
-    routingKey: AUCTION_FINISHED_ROUTING_KEY,
-    errorBehavior: MessageHandlerErrorBehavior.ACK,
+    service: AUCTION_SERVICE,
+    cmd: AUCTION_CMD_FINISHED,
+    type: 'sub',
   })
   async handleAuctionFinished({ message }: { message: AuctionFinishedDto }) {
     this.logger.verbose('Consuming auction finished');

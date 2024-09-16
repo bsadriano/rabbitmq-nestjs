@@ -1,7 +1,6 @@
 import { ArgsType, Field, Int } from '@nestjs/graphql';
 import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
 import * as Relay from 'graphql-relay';
-import { ConnectionArgs } from 'nestjs-graphql-relay';
 
 @ArgsType()
 export class ItemsConnectionArgs {
