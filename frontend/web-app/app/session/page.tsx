@@ -1,6 +1,5 @@
+import Heading from "@/app/components/Heading";
 import { auth } from "@/auth";
-import React from "react";
-import Heading from "../components/Heading";
 
 interface Props {}
 

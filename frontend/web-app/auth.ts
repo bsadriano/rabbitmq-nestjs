@@ -47,13 +47,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.accessTokenExpires = (decodedToken?.exp! * 1000) as number;
       }
 
-      console.log(
-        "**** Access token expires on *****",
-        token.accessTokenExpires,
-        new Date(token.accessTokenExpires as number).toLocaleString()
-      );
+      // console.log(
+      //   "**** Access token expires on *****",
+      //   token.accessTokenExpires,
+      //   new Date(token.accessTokenExpires as number).toLocaleString()
+      // );
       if (Date.now() < (token.accessTokenExpires as number)) {
-        console.log("**** returning previous token ******");
+        // console.log("**** returning previous token ******");
         return token;
       }
       if (!token.refreshToken) throw new TypeError("Missing refreshToken");

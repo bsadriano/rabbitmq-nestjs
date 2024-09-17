@@ -1,5 +1,5 @@
 import { auth, UserSchema } from "@/auth";
-import { FieldValue, FieldValues } from "react-hook-form";
+import { FieldValues } from "react-hook-form";
 
 const baseUrl = process.env.APP_API_URL || "http://localhost:8080/api";
 
@@ -74,20 +74,25 @@ export interface ErrorResponse {
 async function handleResponse(response: Response) {
   try {
     const text = await response.text();
-    const data = text && JSON.parse(text);
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (error) {
+      data = text;
+    }
 
     if (response.ok) {
       return data || response.statusText;
+    } else {
+      const error = {
+        status: response.status,
+        message: typeof data === "string" ? data : response.statusText,
+      };
+
+      return {
+        error,
+      };
     }
-
-    const error = {
-      status: response.status,
-      message: response.statusText,
-    };
-
-    return {
-      error,
-    };
   } catch (error: any) {
     return {
       error,
@@ -108,6 +113,16 @@ const Auth = {
   refreshToken: (token: string) => post("auth/refresh-token", { token }),
 };
 
+const Bids = {
+  get: (id: number | string) => get(`bids/${id}`),
+  placeBidForAuction: (body: PlaceBidRequestDto) => post("bids", body),
+};
+
+export interface PlaceBidRequestDto {
+  auctionId: string;
+  amount: number;
+}
+
 const agent = {
   get,
   post,
@@ -115,6 +130,7 @@ const agent = {
   del,
   Auctions,
   Auth,
+  Bids,
 };
 
 export default agent;

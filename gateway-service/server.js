@@ -6,7 +6,7 @@ const app = express();
 const auctionsProxy = createProxyMiddleware({
   target: "http://localhost:7001/api/auctions",
   changeOrigin: true,
-  pathRewrite: { "^/api/auth": "" },
+  pathRewrite: { "^/api/auctions": "" },
 });
 
 const authProxy = createProxyMiddleware({
@@ -21,6 +21,12 @@ const graphqlProxy = createProxyMiddleware({
   pathRewrite: { "^/graphql": "" },
 });
 
+const bidsProxy = createProxyMiddleware({
+  target: "http://localhost:7004/api/bids",
+  changeOrigin: true,
+  pathRewrite: { "^/api/bids": "" },
+});
+
 const wsProxy = createProxyMiddleware({
   target: "http://localhost:7005",
   changeOrigin: true,
@@ -29,6 +35,7 @@ const wsProxy = createProxyMiddleware({
 
 app.use("/api/auctions", auctionsProxy);
 app.use("/api/auth", authProxy);
+app.use("/api/bids", bidsProxy);
 app.use("/graphql", graphqlProxy);
 app.use("/ws", wsProxy);
 

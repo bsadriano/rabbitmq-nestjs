@@ -4,6 +4,7 @@ import NavBar from "./ui/nav/navbar";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
 import { Toaster } from "react-hot-toast";
+import WSProvider from "./providers/ws-provider";
 
 export const expiremental_ppr = true;
 
@@ -18,13 +19,16 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
+
   return (
     <html lang="en">
       <body>
         <SessionProvider session={session}>
           <Toaster position="bottom-right" />
           <NavBar />
-          <main className="container mx-auto px-5 pt-10">{children}</main>
+          <main className="container mx-auto px-5 pt-10">
+            <WSProvider user={session?.user}>{children}</WSProvider>
+          </main>
         </SessionProvider>
       </body>
     </html>

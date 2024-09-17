@@ -4,7 +4,7 @@ import {
   Serialize,
   User,
 } from '@bsadriano/rmq-nestjs-lib';
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { BidDto } from './dto/bid.dto';
 import { PlaceBidRequestDto } from './dto/place-bid-request.dto';
 import { BidService } from './services/bid.service';
@@ -22,10 +22,10 @@ export class BidController {
     return this.bidService.placeBid(user, placeBidRequestDto);
   }
 
-  @Get(':id')
+  @Get(':auctionId')
   @Serialize(BidDto)
   @UseGuards(JwtAuthGuard)
-  getBidsForAuction(@Body('auctionId') auctionId: number) {
+  getBidsForAuction(@Param('auctionId') auctionId: number) {
     return this.bidService.getBidsForAuction(auctionId);
   }
 }

@@ -135,6 +135,7 @@ export class BidService {
   }
 
   getBidsForAuction(auctionId: number) {
-    this.auctionModel.find({ auctionId });
+    console.log(auctionId);
+    return this.bidModel.find({ auctionId });
   }
 }

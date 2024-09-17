@@ -1,18 +1,18 @@
 import {
+  AuctionBidPlacedDto,
   AuctionCreatedDto,
-  AuctionDeletedDto,
-  AuctionUpdatedDto,
+  AuctionFinishedDto,
   RMQMessage,
 } from '@bsadriano/rmq-nestjs-lib';
 import { Injectable, Logger } from '@nestjs/common';
 import {
+  AUCTION_BID_PLACED_EXCHANGE,
+  AUCTION_CMD_BID_PLACED,
   AUCTION_CMD_CREATED,
-  AUCTION_CMD_DELETED,
-  AUCTION_CMD_UPDATED,
+  AUCTION_CMD_FINISHED,
   AUCTION_CREATED_EXCHANGE,
-  AUCTION_DELETED_EXCHANGE,
+  AUCTION_FINISHED_EXCHANGE,
   AUCTION_SERVICE,
-  AUCTION_UPDATED_EXCHANGE,
 } from 'src/services';
 import { SocketService } from 'src/socket/socket.service';
 
@@ -37,30 +37,30 @@ export class ConsumersService {
   }
 
   @RMQMessage({
-    exchange: AUCTION_UPDATED_EXCHANGE,
+    exchange: AUCTION_FINISHED_EXCHANGE,
     service: AUCTION_SERVICE,
-    cmd: AUCTION_CMD_UPDATED,
+    cmd: AUCTION_CMD_FINISHED,
     type: 'sub',
   })
-  async handleAuctionUpdated({ message }: { message: AuctionUpdatedDto }) {
+  async handleAuctionFinished({ message }: { message: AuctionFinishedDto }) {
     this.logger.verbose(
-      `Handling auction updated with data: "${JSON.stringify(message)}"`,
+      `Handling auction finished with data: "${JSON.stringify(message)}"`,
     );
 
-    this.socketService.socket.emit('AuctionUpdated', message);
+    this.socketService.socket.emit('AuctionFinished', message);
   }
 
   @RMQMessage({
-    exchange: AUCTION_DELETED_EXCHANGE,
+    exchange: AUCTION_BID_PLACED_EXCHANGE,
     service: AUCTION_SERVICE,
-    cmd: AUCTION_CMD_DELETED,
+    cmd: AUCTION_CMD_BID_PLACED,
     type: 'sub',
   })
-  async handleAuctionDeleted({ message }: { message: AuctionDeletedDto }) {
+  async handleAuctionBidPlaced({ message }: { message: AuctionBidPlacedDto }) {
     this.logger.verbose(
-      `Handling auction deleted with data: "${JSON.stringify(message)}"`,
+      `Handling auction bid placed with data: "${JSON.stringify(message)}"`,
     );
 
-    this.socketService.socket.emit('AuctionDeleted', message);
+    this.socketService.socket.emit('BidPlaced', message);
   }
 }

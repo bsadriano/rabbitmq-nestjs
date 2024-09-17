@@ -9,10 +9,10 @@ export class BidDto {
   auctionId: number;
 
   @Expose()
-  seller: string;
+  bidder: string;
 
   @Expose()
-  createdAt: string;
+  bidTime: string;
 
   @Expose()
   amount: number;

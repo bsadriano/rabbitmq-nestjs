@@ -1,19 +1,20 @@
 "use client";
 
-import { AuctionConnection } from "@/app/lib/definitions";
+import { useParamsStore } from "@/app/hooks/useParamsStore";
 import { useEffect, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
-import { useParamsStore } from "@/app/hooks/useParamsStore";
 
 import { getData } from "@/app/actions/auction.actions";
-import EmptyFilter from "./empty-filter";
-import AuctionCard from "./auction-card";
-import Filters from "./filters";
-import { useSession } from "next-auth/react";
+import { useAuctionStore } from "@/app/hooks/useAuctionStore";
 import clsx from "clsx";
+import { useSession } from "next-auth/react";
+import AuctionCard from "./auction-card";
+import EmptyFilter from "./empty-filter";
+import Filters from "./filters";
 
 const Listings = () => {
-  const [data, setData] = useState<AuctionConnection>();
+  // const [data, setData] = useState<AuctionConnection>();
+  const [loading, setLoading] = useState(true);
 
   const hasNextPage = useParamsStore((state) => state.hasNextPage);
   const hasPreviousPage = useParamsStore((state) => state.hasPreviousPage);
@@ -31,11 +32,13 @@ const Listings = () => {
       filterBy: state.filterBy,
       next: state.next,
       prev: state.prev,
-      // seller: session?.user.name ?? "",
       seller: state.seller,
       winner: state.winner,
     }))
   );
+
+  const data = useAuctionStore((state) => state.data);
+  const setData = useAuctionStore((state) => state.setData);
 
   const setParams = useParamsStore((state) => state.setParams);
 
@@ -56,8 +59,9 @@ const Listings = () => {
           : hasPreviousPage,
       });
       setData(data);
+      setLoading(false);
     });
-  }, [params, hasNextPage, hasPreviousPage, setParams]);
+  }, [params, hasNextPage, hasPreviousPage, setParams, setData]);
 
   const fetchPrevious = () => {
     setParams({

@@ -1,8 +1,8 @@
-import React from "react";
 import { Auction } from "@/app/lib/definitions";
+import Link from "next/link";
 import CarImage from "./car-image";
 import CountdownTimer from "./countdown-timer";
-import Link from "next/link";
+import CurrentBid from "./current-bid";
 
 interface Props {
   auction: Auction;
@@ -15,6 +15,12 @@ const AuctionCard = ({ auction }: Props) => {
         <CarImage imageUrl={auction.imageUrl} />
         <div className="absolute bottom-2 left-2">
           <CountdownTimer auctionEnd={auction.auctionEnd} />
+        </div>
+        <div className="absolute top-2 right-2">
+          <CurrentBid
+            reservePrice={auction.reservePrice}
+            amount={auction.currentHighBid ?? 0}
+          />
         </div>
       </div>
       <div className="flex justify-between items-center mt-4">

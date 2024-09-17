@@ -1,5 +1,7 @@
 "use client";
 
+import { authenticate } from "@/app/actions/auth.actions";
+import { Button } from "@/app/ui/button";
 import { lusitana } from "@/app/ui/fonts";
 import { ArrowRightIcon } from "@heroicons/react/20/solid";
 import {
@@ -8,8 +10,6 @@ import {
   KeyIcon,
 } from "@heroicons/react/24/outline";
 import { useActionState } from "react";
-import { authenticate } from "../actions/auth.actions";
-import { Button } from "../ui/button";
 
 export default function Page() {
   const [errorMessage, formAction, isPending] = useActionState(
