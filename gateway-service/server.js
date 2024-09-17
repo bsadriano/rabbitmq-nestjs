@@ -21,9 +21,16 @@ const graphqlProxy = createProxyMiddleware({
   pathRewrite: { "^/graphql": "" },
 });
 
+const wsProxy = createProxyMiddleware({
+  target: "http://localhost:7005",
+  changeOrigin: true,
+  pathRewrite: { "^/ws": "" },
+});
+
 app.use("/api/auctions", auctionsProxy);
 app.use("/api/auth", authProxy);
 app.use("/graphql", graphqlProxy);
+app.use("/ws", wsProxy);
 
 app.listen(8080, () => {
   console.log("Proxy server listening on port 8080");

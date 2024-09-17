@@ -18,3 +18,7 @@ npm run start:dev
 cd ..
 cd "bid-service"
 npm run start &
+
+cd ..
+cd "notification-service"
+npm run start &
