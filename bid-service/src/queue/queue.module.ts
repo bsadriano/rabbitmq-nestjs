@@ -17,7 +17,6 @@ import { QueueService } from './queue.service';
       ],
     }),
   ],
-  controllers: [],
   providers: [QueueService],
 })
 export class QueueModule {}

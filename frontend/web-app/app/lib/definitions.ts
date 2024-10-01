@@ -55,4 +55,5 @@ export type AppUser = {
   lastName: string;
   accessToken: string;
   refreshToken: string;
+  error?: "AccessTokenError" | "RefreshTokenError" | undefined;
 };

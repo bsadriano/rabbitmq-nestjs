@@ -10,6 +10,9 @@ export default () => ({
     auction_finished_queue: process.env.RMQ_AUCTION_FINISHED_QUEUE,
     auction_bid_placed_queue: process.env.RMQ_AUCTION_BID_PLACED_QUEUE,
   },
+  grpc: {
+    url: process.env.GRPC_URL,
+  },
   mongodb: {
     uri: process.env.MONGODB_URI,
   },

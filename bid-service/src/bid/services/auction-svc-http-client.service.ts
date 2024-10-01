@@ -20,32 +20,41 @@ export class AuctionSvcHttpClientService {
   ) {}
 
   async getItemsForSearchDb(): Promise<AuctionResponseDto[]> {
-    const lastUpdated = await this.auctionModel
-      .findOne({})
-      .select('updatedAt')
-      .sort('-updatedAt');
+    try {
+      const lastUpdated = await this.auctionModel
+        .findOne({})
+        .select('updatedAt')
+        .sort('-updatedAt');
 
-    const auctionURL = this.configService.get<string>('auction_service.url');
+      const auctionURL = this.configService.get<string>('auction_service.url');
 
-    if (!auctionURL) {
-      throw new Error('Argument cannot be null');
+      if (!auctionURL) {
+        throw new Error('Argument cannot be null');
+      }
+
+      let url = auctionURL + '/seed';
+
+      if (lastUpdated !== null && lastUpdated.updatedAt) {
+        url += `?date=${format(lastUpdated.updatedAt, 'yyyy-MM-dd HH:mm:ss')}`;
+      }
+
+      console.log({
+        url,
+      });
+
+      const { data } = await firstValueFrom(
+        this.httpService.get(url).pipe(
+          catchError((error: AxiosError) => {
+            this.logger.log('Error in grpc: ' + error.message);
+            return of(null);
+          }),
+        ),
+      );
+
+      return data ?? [];
+    } catch (error) {
+      console.log(error);
+      return [];
     }
-
-    let url = auctionURL + '/api/auctions/seed';
-
-    if (lastUpdated !== null && lastUpdated.updatedAt) {
-      url += `?date=${format(lastUpdated.updatedAt, 'yyyy-MM-dd HH:mm:ss')}`;
-    }
-
-    const { data } = await firstValueFrom(
-      this.httpService.get(url).pipe(
-        catchError((error: AxiosError) => {
-          this.logger.log('Error in grpc: ' + error.message);
-          return of(null);
-        }),
-      ),
-    );
-
-    return data ?? [];
   }
 }

@@ -65,3 +65,11 @@ export type AuctionFinished = {
   seller: string;
   amount?: number;
 };
+
+export type RegisterUserDto = {
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+};

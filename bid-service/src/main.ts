@@ -17,6 +17,7 @@ async function bootstrap() {
       },
     }),
   );
+  app.setGlobalPrefix('api/bids');
 
   const configService = app.get(ConfigService);
   await app.listen(configService.get<number>('port'));

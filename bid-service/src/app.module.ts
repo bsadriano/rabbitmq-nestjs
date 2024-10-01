@@ -1,9 +1,10 @@
+import { HealthModule } from '@bsadriano/rmq-nestjs-lib';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { BidModule } from './bid/bid.module';
 import configuration from './config/configuration';
 import { QueueModule } from './queue/queue.module';
-import { BidModule } from './bid/bid.module';
 
 @Module({
   imports: [
@@ -19,10 +20,9 @@ import { BidModule } from './bid/bid.module';
       },
       inject: [ConfigService],
     }),
+    HealthModule,
     QueueModule,
     BidModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}

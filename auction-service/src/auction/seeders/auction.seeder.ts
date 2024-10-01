@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { DataFactory, seeder, Seeder } from 'nestjs-seeder';
@@ -56,16 +56,19 @@ seeder({
       isGlobal: true,
       load: [configuration],
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'pass123',
-      database: 'postgres',
-      autoLoadEntities: true,
-      entities: [Auction, User],
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        type: configService.get<string>('database.type') as 'aurora-mysql',
+        host: configService.get<string>('database.host'),
+        port: configService.get<number>('database.port'),
+        username: configService.get<string>('database.username'),
+        password: configService.get<string>('database.password'),
+        database: configService.get<string>('database.database'),
+        autoLoadEntities: true,
+        entities: [Auction, User],
+        synchronize: configService.get<boolean>('database.synchronize'),
+      }),
+      inject: [ConfigService],
     }),
     AuctionModule,
   ],

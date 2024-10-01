@@ -9,6 +9,9 @@ export default () => ({
     database: process.env.DATABASE_NAME,
     synchronize: process.env.DATABASE_SYNCHRONIZE,
   },
+  grpc: {
+    uri: process.env.GRPC_URI,
+  },
   rmq: {
     uri: process.env.RMQ_URI,
   },

@@ -1,5 +1,6 @@
 import { auth, UserSchema } from "@/auth";
 import { FieldValues } from "react-hook-form";
+import { RegisterUserDto } from "../types";
 
 const baseUrl = process.env.APP_API_URL || "http://localhost:8080/api";
 
@@ -86,7 +87,10 @@ async function handleResponse(response: Response) {
     } else {
       const error = {
         status: response.status,
-        message: typeof data === "string" ? data : response.statusText,
+        message:
+          typeof data === "string"
+            ? data
+            : data?.message ?? response.statusText,
       };
 
       return {
@@ -110,12 +114,14 @@ const Auctions = {
 
 const Auth = {
   login: (body: UserSchema) => post("auth/login", body),
+  register: (body: RegisterUserDto) => post("auth/register", body),
   refreshToken: (token: string) => post("auth/refresh-token", { token }),
 };
 
 const Bids = {
   get: (id: number | string) => get(`bids/${id}`),
-  placeBidForAuction: (body: PlaceBidRequestDto) => post("bids", body),
+  placeBidForAuction: (body: PlaceBidRequestDto) =>
+    post("bids/place-bid", body),
 };
 
 export interface PlaceBidRequestDto {

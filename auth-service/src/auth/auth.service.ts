@@ -148,7 +148,10 @@ export class AuthService {
   refresh(token: string) {
     const { userId } = this.jwtService.decode(token);
     const accessToken = this.generateToken(userId);
-    const refreshToken = this.generateToken(userId, 3600 * 24);
+    const refreshToken = this.generateToken(
+      userId,
+      this.configService.get<number>('jwt.refresh_expiration'),
+    );
 
     return {
       accessToken: accessToken.token,

@@ -1,5 +1,6 @@
 import { ReflectionService } from '@grpc/reflection';
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
 import { join } from 'path';
@@ -12,18 +13,22 @@ import { BidService } from './services/bid.service';
 
 @Module({
   imports: [
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: 'AUCTION_PACKAGE',
-        transport: Transport.GRPC,
-        options: {
-          package: 'auction',
-          protoPath: join(__dirname, '../../auction.proto'),
-          url: 'localhost:5001',
-          onLoadPackageDefinition: (pkg, server) => {
-            new ReflectionService(pkg).addToServer(server);
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.GRPC,
+          options: {
+            package: 'auction',
+            protoPath: join(__dirname, '../../auction.proto'),
+            url: configService.get<string>('grpc.url'),
+            // url: 'auction-service:5001',
+            onLoadPackageDefinition: (pkg, server) => {
+              new ReflectionService(pkg).addToServer(server);
+            },
           },
-        },
+        }),
+        inject: [ConfigService],
       },
     ]),
     MongooseModule.forFeature([

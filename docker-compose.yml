@@ -10,9 +10,7 @@ services:
     volumes:
       - pgdata:/data/postgres
     ports:
-      - "5432:5432"
-    networks:
-      - postgres
+      - "${PG_PORT:-5432}:5432"
     restart: unless-stopped
 
   pgadmin:
@@ -25,8 +23,6 @@ services:
       - pgadmin:/var/lib/pgadmin
     ports:
       - "${PGADMIN_PORT:-5050}:80"
-    networks:
-      - postgres
     restart: unless-stopped
 
   mongodb:
@@ -35,39 +31,129 @@ services:
     volumes:
       - mongodb_data:/data/db
     ports:
-      - 27017:27017
-    networks:
-      - mongo-database
+      - ${MONGODB_PORT:-27017}:27017
 
   mongo-express:
     image: mongo-express:latest
     container_name: mongoui
     environment:
-      - ME_CONFIG_MONGODB_SERVER=mongodb
-      - ME_CONFIG_BASICAUTH_USERNAME=root
-      - ME_CONFIG_BASICAUTH_PASSWORD=root
+      - ME_CONFIG_MONGODB_SERVER=${ME_SERVER:-mongodb}
+      - ME_CONFIG_BASICAUTH_USERNAME=${ME_USERNAME:-root}
+      - ME_CONFIG_BASICAUTH_PASSWORD=${ME_PASSWORD:-root}
     ports:
-      - 8081:8081
-    networks:
-      - mongo-database
+      - ${ME_PORT:-8081}:8081
     depends_on:
       - mongodb
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: "rabbitmq"
+    container_name: rabbitmq
+    hostname: ${RABBITMQ_HOST:-rabbitmq}
     ports:
-      - 5672:5672
-      - 15672:15672
+      - ${RABBITMQ_MANAGEMENT_PORT-15672}:15672
+      - ${RABBITMQ_PORT-5672}:5672
     volumes:
       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
 
-networks:
-  postgres:
-    driver: bridge
-  mongo-database:
-    driver: bridge
+  auction-service:
+    build:
+      context: ./auction-service
+      dockerfile: Dockerfile
+    ports:
+      - "${AUCTION_PORT-7001}:7001"
+    env_file:
+      - ./auction-service/.env.docker
+    depends_on:
+      - rabbitmq
+      - postgres_db
+    volumes:
+      - ./auction-service/src:/usr/src/app/src
+
+  search-service:
+    build:
+      context: ./search-service
+      dockerfile: Dockerfile
+    ports:
+      - "${SEARCH_PORT-7002}:7002"
+    env_file:
+      - ./search-service/.env.docker
+    depends_on:
+      - rabbitmq
+      - mongodb
+    volumes:
+      - ./search-service/src:/usr/src/app/src
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "${AUTH_PORT-7003}:7003"
+    env_file:
+      - ./auth-service/.env.docker
+    depends_on:
+      - rabbitmq
+      - auction-service
+    volumes:
+      - ./auth-service/src:/usr/src/app/src
+
+  bid-service:
+    build:
+      context: ./bid-service
+      dockerfile: Dockerfile
+    ports:
+      - "${BID_PORT-7004}:7004"
+    env_file:
+      - ./bid-service/.env.docker
+    depends_on:
+      - rabbitmq
+      - mongodb
+    volumes:
+      - ./bid-service/src:/usr/src/app/src
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "${NOTIFICATION_PORT-7005}:7005"
+    env_file:
+      - ./notification-service/.env.docker
+    depends_on:
+      - rabbitmq
+      - mongodb
+    volumes:
+      - ./notification-service/src:/usr/src/app/src
+
+  nginx:
+    image: nginx
+    env_file:
+      - .env
+    restart: always
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: ${NGINX_HOST}
+    ports:
+      - ${NGINX_PORT}:${NGINX_PORT}
+    depends_on:
+      - auction-service
+      - search-service
+      - auth-service
+      - bid-service
+
+  web-app:
+    build:
+      context: ./frontend/web-app
+      dockerfile: Dockerfile
+    env_file:
+      - ./frontend/web-app/.env.docker
+    container_name: ${WEB_APP_HOST}
+    ports:
+      - ${WEB_APP_PORT}:${WEB_APP_PORT}
+    volumes:
+      - ./frontend/web-app/app:/usr/src/app/app
 
 volumes:
   pgdata:

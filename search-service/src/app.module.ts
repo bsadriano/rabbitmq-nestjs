@@ -1,3 +1,4 @@
+import { HealthModule } from '@bsadriano/rmq-nestjs-lib';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -14,24 +15,27 @@ import { SearchModule } from './search/search.module';
       load: [configuration],
     }),
     MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async () => {
+      useFactory: async (configService: ConfigService) => {
         return {
-          uri: 'mongodb://localhost:27017/search',
+          uri: configService.get<string>('mongodb.uri'),
         };
       },
       inject: [ConfigService],
     }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      playground: {
-        endpoint: 'http://localhost:7002/graphql',
-      },
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: true,
-      context: ({ req, res }) => ({ req, res }),
+      useFactory: (configService: ConfigService) => ({
+        playground: {
+          endpoint: configService.get<string>('graphql.endpoint'),
+        },
+        autoSchemaFile: true,
+        context: ({ req, res }) => ({ req, res }),
+      }),
+      inject: [ConfigService],
     }),
     SearchModule,
     QueueModule,
+    HealthModule,
   ],
   controllers: [],
 })

@@ -20,7 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@bsadriano/rmq-nestjs-lib": "^0.2.1",
+    "@bsadriano/rmq-nestjs-lib": "^0.2.3",
     "@golevelup/nestjs-rabbitmq": "^5.4.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.3",

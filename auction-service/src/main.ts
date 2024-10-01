@@ -2,7 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { grpcClientOptions } from './grpc-client.options';
+import { GrpcConfigService } from './grpc-auction/grpc-config.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,8 +17,10 @@ async function bootstrap() {
       },
     }),
   );
+  app.setGlobalPrefix('api/auctions');
 
-  app.connectMicroservice(grpcClientOptions);
+  const grpcConfigService = app.get(GrpcConfigService);
+  app.connectMicroservice(grpcConfigService.getGrpcClientOptions);
 
   const configService = app.get(ConfigService);
   await app.startAllMicroservices();

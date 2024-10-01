@@ -4,7 +4,7 @@ import { getBidsForAuction } from "@/app/actions/auction.actions";
 import EmptyFilter from "@/app/components/EmptyFilter";
 import Heading from "@/app/components/Heading";
 import { useBidStore } from "@/app/hooks/useBidStore";
-import { numberWithCommas } from "@/app/lib/numberWithComma";
+import { numberWithCommas } from "@/app/lib/number-with-commas";
 import { Auction, Bid } from "@/app/types";
 import { User } from "next-auth";
 import { useEffect, useState } from "react";

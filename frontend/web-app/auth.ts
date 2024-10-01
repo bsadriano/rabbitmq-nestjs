@@ -4,6 +4,7 @@ import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
 import agent from "./app/lib/agent";
 import { authConfig } from "./auth.config";
+const baseUrl = process.env.APP_API_URL || "http://localhost:8080/api";
 
 const userSchema = z.object({
   email: z.string().email(),
@@ -21,7 +22,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (success) {
           const user = await agent.Auth.login(data);
-          if (!(user && "error" in user)) {
+          console.log({
+            user,
+          });
+          if (!(user && "status" in user && user.status === "error")) {
             return user;
           }
         }
@@ -44,30 +48,44 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       if (token.accessToken) {
         const decodedToken = jwtDecode(token.accessToken as string);
-        token.accessTokenExpires = (decodedToken?.exp! * 1000) as number;
+        token.accessTokenExpires = Number(decodedToken?.exp!);
       }
 
-      // console.log(
-      //   "**** Access token expires on *****",
-      //   token.accessTokenExpires,
-      //   new Date(token.accessTokenExpires as number).toLocaleString()
-      // );
-      if (Date.now() < (token.accessTokenExpires as number)) {
+      if (token.refreshToken) {
+        const decodedToken = jwtDecode(token.refreshToken as string);
+        token.refreshTokenExpires = Number(decodedToken?.exp!);
+      }
+
+      if (
+        token.accessTokenExpires &&
+        Date.now() < Number(token.accessTokenExpires) * 1000
+      ) {
         // console.log("**** returning previous token ******");
         return token;
       }
+
       if (!token.refreshToken) throw new TypeError("Missing refreshToken");
 
+      // refresh token also expired, logout user
+      if (Date.now() >= Number(token.refreshTokenExpires) * 1000) {
+        return {
+          ...token,
+          error: "AccessTokenError",
+        };
+      }
+
       try {
-        const response = await fetch(
-          "http://localhost:8080/api/auth/refresh-token",
-          {
-            method: "POST",
-            body: new URLSearchParams({
-              token: token.refreshToken as string,
-            }),
-          }
-        );
+        console.log({
+          huh: {
+            token: token.refreshToken as string,
+          },
+        });
+        const response = await fetch(`${baseUrl}/auth/refresh-token`, {
+          method: "POST",
+          body: new URLSearchParams({
+            token: token.refreshToken as string,
+          }),
+        });
 
         const tokensOrError = await response.json();
         if (!response.ok) throw tokensOrError;
@@ -76,15 +94,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           accessToken: string;
           refreshToken: string;
         };
-        const decodedToken = jwtDecode(newTokens.accessToken as string);
+        const decodedAccessToken = jwtDecode(newTokens.accessToken as string);
+        const decodedRefreshToken = jwtDecode(newTokens.refreshToken as string);
 
         token.refreshToken = newTokens.refreshToken;
         token.accessToken = newTokens.accessToken;
-        token.accessTokenExpires = (decodedToken?.exp! * 1000) as number;
+        token.accessTokenExpires = Number(decodedAccessToken?.exp!);
+        token.refreshTokenExpires = Number(decodedRefreshToken?.exp!);
 
         return token;
-      } catch (error) {
-        console.error("Error refreshing accessToken", error);
+      } catch (error: any) {
+        console.error(
+          "Error refreshing accessToken",
+          error.message,
+          error.stack
+        );
         token.error = "RefreshTokenError";
         return token;
       }
@@ -95,6 +119,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       if (typeof token.refreshToken === "string") {
         session.refreshToken = token.refreshToken;
+      }
+      if (typeof token.error === "string") {
+        session.error = token.error;
       }
       session.user = {
         ...session.user,

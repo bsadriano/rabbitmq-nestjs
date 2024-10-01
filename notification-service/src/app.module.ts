@@ -1,9 +1,10 @@
+import { HealthModule } from '@bsadriano/rmq-nestjs-lib';
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import configuration from './config/configuration';
 import { NotificationGateway } from './notification/notification.gateway';
 import { QueueModule } from './queue/queue.module';
 import { SocketModule } from './socket/socket.module';
-import { ConfigModule } from '@nestjs/config';
-import configuration from './config/configuration';
 
 @Module({
   imports: [
@@ -11,10 +12,10 @@ import configuration from './config/configuration';
       isGlobal: true,
       load: [configuration],
     }),
+    HealthModule,
     QueueModule,
     SocketModule,
   ],
-  controllers: [],
   providers: [NotificationGateway],
 })
 export class AppModule {}

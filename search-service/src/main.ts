@@ -8,6 +8,7 @@ async function bootstrap() {
 
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
+  app.setGlobalPrefix('api/search');
 
   const configService = app.get(ConfigService);
   await app.listen(configService.get<number>('port'));

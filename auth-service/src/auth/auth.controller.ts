@@ -1,5 +1,6 @@
 import { CurrentUser, Serialize } from '@bsadriano/rmq-nestjs-lib';
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -15,7 +16,7 @@ import { UserDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
 import LocalAuthGuard from './guards/local-auth.guard';
 
-@Controller('api/auth')
+@Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -51,12 +52,23 @@ export class AuthController {
   }
 
   @Post('register')
-  register(@Body() createUserDto: CreateUserDto) {
-    return this.authService.createUser(createUserDto);
+  async register(@Body() createUserDto: CreateUserDto) {
+    const res: any = await this.authService.createUser(createUserDto);
+
+    if ('status' in res && res.status === 'error') {
+      throw new BadRequestException(res.message);
+    }
+
+    return res;
   }
 
   @Post('logout')
   logout(@Res({ passthrough: true }) response: Response) {
     this.authService.logout(response);
+  }
+
+  @Get('test')
+  test() {
+    return 'tests';
   }
 }

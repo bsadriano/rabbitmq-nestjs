@@ -3,11 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { AxiosError } from 'axios';
+import { format } from 'date-fns';
 import { Model } from 'mongoose';
 import { catchError, firstValueFrom } from 'rxjs';
-import { Item } from '../item.schema';
 import { AuctionResponseDto } from '../dto/auction-response.dto';
-import { format } from 'date-fns';
+import { Item } from '../item.schema';
 
 @Injectable()
 export class AuctionSvcHttpClientService {
@@ -18,32 +18,37 @@ export class AuctionSvcHttpClientService {
   ) {}
 
   async getItemsForSearchDb(): Promise<AuctionResponseDto[]> {
-    const lastUpdated = await this.itemModel
-      .findOne({})
-      .select('updatedAt')
-      .sort('-updatedAt');
+    try {
+      const lastUpdated = await this.itemModel
+        .findOne({})
+        .select('updatedAt')
+        .sort('-updatedAt');
 
-    const auctionURL = this.configService.get<string>('auction_service.url');
+      const auctionURL = this.configService.get<string>('auction_service.url');
 
-    if (!auctionURL) {
-      throw new Error('Argument cannot be null');
+      if (!auctionURL) {
+        throw new Error('Argument cannot be null');
+      }
+
+      let url = auctionURL + '/seed';
+
+      if (lastUpdated !== null && lastUpdated.updatedAt) {
+        url += `?date=${format(lastUpdated.updatedAt, 'yyyy-MM-dd HH:mm:ss')}`;
+      }
+
+      const { data } = await firstValueFrom(
+        this.httpService.get(url).pipe(
+          catchError((error: AxiosError) => {
+            console.log(error.message);
+            throw 'An error happened!';
+          }),
+        ),
+      );
+
+      return data ?? [];
+    } catch (error) {
+      console.log(error);
+      return [];
     }
-
-    let url = auctionURL + '/api/auctions/seed';
-
-    if (lastUpdated !== null && lastUpdated.updatedAt) {
-      url += `?date=${format(lastUpdated.updatedAt, 'yyyy-MM-dd HH:mm:ss')}`;
-    }
-
-    const { data } = await firstValueFrom(
-      this.httpService.get(url).pipe(
-        catchError((error: AxiosError) => {
-          console.log(error.message);
-          throw 'An error happened!';
-        }),
-      ),
-    );
-
-    return data ?? [];
   }
 }

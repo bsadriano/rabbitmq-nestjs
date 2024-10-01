@@ -9,6 +9,7 @@ import {
   ExclamationCircleIcon,
   KeyIcon,
 } from "@heroicons/react/24/outline";
+import Link from "next/link";
 import { useActionState } from "react";
 
 export default function Page() {
@@ -21,9 +22,7 @@ export default function Page() {
     <main className="container mx-auto px-5 pt-10 w-1/2">
       <form action={formAction} className="space-y-3">
         <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
-          <h1 className={`${lusitana.className} mb-3 text-2xl`}>
-            Please log in to continue.
-          </h1>
+          <h1 className={`${lusitana.className} mb-3 text-2xl`}>Login</h1>
           <div className="w-full">
             <div>
               <label
@@ -64,6 +63,9 @@ export default function Page() {
                 <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
               </div>
             </div>
+          </div>
+          <div className="mt-4 pb-2">
+            <Link href="/register">New user? Register here</Link>
           </div>
           <Button className="mt-4 w-full" aria-disabled={isPending}>
             Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />

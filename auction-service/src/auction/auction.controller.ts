@@ -20,7 +20,7 @@ import { AuctionDto } from './dto/auction.dto';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
 
-@Controller('api/auctions')
+@Controller()
 export class AuctionController {
   constructor(private readonly auctionService: AuctionService) {}
 

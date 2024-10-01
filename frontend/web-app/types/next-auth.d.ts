@@ -6,6 +6,7 @@ declare module "next-auth" {
     user: AppUser & DefaultSession["user"];
     accessToken: string;
     refreshToken: string;
+    error: string;
   }
 
   interface Profile {
@@ -23,3 +24,5 @@ declare module "next-auth/jwt" {
     accessToken: string;
   }
 }
+
+export declare module "next-auth" {}

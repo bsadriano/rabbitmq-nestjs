@@ -1,0 +1,51 @@
+server {
+    listen       8080 default_server;
+    listen  [::]:8080 default_server;
+
+    #access_log  /var/log/nginx/host.access.log  main;
+    
+    location /api/auctions {
+        include proxy_headers.conf;  
+        proxy_pass http://${AUCTION_HOST}:${AUCTION_PORT};
+        proxy_redirect off;
+    }
+    
+    location /api/search {
+        include proxy_headers.conf;  
+        proxy_pass http://${SEARCH_HOST}:${SEARCH_PORT};
+        proxy_redirect off;
+    }
+
+    location /graphql {
+        include proxy_headers.conf;  
+        proxy_pass http://${SEARCH_HOST}:${SEARCH_PORT}/graphql/;
+        proxy_redirect off;
+    }
+
+    location /api/auth {
+        include proxy_headers.conf;  
+        proxy_pass http://${AUTH_HOST}:${AUTH_PORT};
+        proxy_redirect off;
+    }
+
+    location /api/bids {
+        include proxy_headers.conf;  
+        proxy_pass http://${BID_HOST}:${BID_PORT};
+        proxy_redirect off;
+    }
+
+    location /api/notification {
+        include proxy_headers.conf;  
+        proxy_pass http://${NOTIFICATION_HOST}:${NOTIFICATION_PORT};
+        proxy_redirect off;
+    }
+
+    #error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+}

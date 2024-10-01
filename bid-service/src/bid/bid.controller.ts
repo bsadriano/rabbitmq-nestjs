@@ -9,11 +9,11 @@ import { BidDto } from './dto/bid.dto';
 import { PlaceBidRequestDto } from './dto/place-bid-request.dto';
 import { BidService } from './services/bid.service';
 
-@Controller('api/bids')
+@Controller()
 export class BidController {
   constructor(private readonly bidService: BidService) {}
 
-  @Post()
+  @Post('place-bid')
   @UseGuards(JwtAuthGuard)
   placeBid(
     @CurrentUser() user: User,
